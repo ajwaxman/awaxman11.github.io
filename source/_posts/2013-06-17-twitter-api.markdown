@@ -28,7 +28,7 @@ In addition to finding people that match either of the criteria above, I also wa
 
 I first looked into the best way to access the Twitter API from a ruby environment.  As Twitter is a very popular app, I figured there was likely a good gem.  After searching for 'Twitter' on <a href="https://ruby-toolbox.com">www.ruby-toolbox.com</a>, I ended up deciding to go with the 'Twitter' gem.  After installing this gem in the terminal, I required the rubygems gem and twitter gem in my ruby file.  
 
-```
+``` ruby
 require 'rubygems'
 require 'twitter'
 ```
