@@ -9,8 +9,7 @@
   <meta name="author" content="Adam Waxman">
 
   
-  <meta name="description" content="Inspiration Getting Started I started working 1
-Hello World Don&rsquo;t Panic. Douglas Adams &ndash; The Hitchhiker&rsquo;s Guide to the Galaxy Don&# &hellip;">
+  <meta name="description" content="Inspiration Over the last year I&rsquo;ve become obsessed with Twitter. So much so that I had to move it off the front page of my phone so I wouldn& &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -71,7 +70,7 @@ Hello World Don&rsquo;t Panic. Douglas Adams &ndash; The Hitchhiker&rsquo;s Guid
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/06/17/building-a-twitter-bot/">Building a Twitter Bot</a></h1>
+      <h1 class="entry-title"><a href="/blog/2013/06/17/building-a-twitter-bot/">Using the Twitter API to Find People on Twitter</a></h1>
     
     
       <p class="meta">
@@ -94,24 +93,172 @@ Hello World Don&rsquo;t Panic. Douglas Adams &ndash; The Hitchhiker&rsquo;s Guid
   </header>
 
 
-  <div class="entry-content"><h2>Inspiration</h2>
+  <div class="entry-content"><h4>Inspiration</h4>
 
-<h2>Getting Started</h2>
+<p>Over the last year I&rsquo;ve become obsessed with Twitter.  So much so that I had to move it off the front page of my phone so I wouldn&rsquo;t be (as) distracted throughout the day.  In addition to my personal account, I have several accounts for apps I&rsquo;m working on.  I use these accounts to discover and interact with people that may be interested in these apps.</p>
 
-<p>I started working</p>
+<p>To discover people that I think may be interested, I look recent follwoers of similar apps.  While this process worked alright, it was a very manual.  Also, one of the apps I&rsquo;m working on is only available in NYC, and there was no way to search for people only living in NYC and the surrounding area.</p>
+
+<h4>Using the Twitter API</h4>
+
+<p>I decided that I could use the Twitter API to help automate this process.  For example, let&rsquo;s pretend that I am creating a Twitter account for a Ruby Motion meetup in NYC.  I&rsquo;d like to find people in the NYC area that are interested in Ruby Motion.  I can find these people a couple of different ways:</p>
+
+<ol style="margin-left: 30px;">
+  <li>Look for people that follow @RubyMotion</li>
+  <li>Look for people that recently tweeted&#8221;#rubymotion&#8221;</li>
+</ol>
+
+
+<p>In addition to finding people that match either of the criteria above, I also want to make sure they live in the NYC area.</p>
+
+<h4>Getting Started</h4>
+
+<p>I first looked into the best way to access the Twitter API from a ruby environment.  As Twitter is a very popular app, I figured that there was a pretty good gem.  After searching for &lsquo;Twitter&rsquo; on <a href="https://ruby-toolbox.com">www.ruby-toolbox.com</a>, I ended up deciding to go with the &lsquo;Twitter&rsquo; gem.  After installing this gem in the terminal, I required the rubygems gem and twitter gem in my ruby file.</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Hello World
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>require 'rubygems'
+</span><span class='line'>require 'twitter'</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next I read the gem documentation on <a href="https://github.com/sferik/twitter">github</a>, and followed the steps to register and authorize my app.  After registering my app on the <a href="https://dev.twitter.com/apps/new">Twitter Developer site</a>, it was just a few lines of adding my app keys before I was up and running.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Twitter.configure do |config|
+</span><span class='line'>  config.consumer_key = "**********************"
+</span><span class='line'>  config.consumer_secret = "*****************************************"
+</span><span class='line'>  config.oauth_token = "**************************************************"
+</span><span class='line'>  config.oauth_token_secret = "*****************************************"
+</span><span class='line'>end</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now I was up and running!  To tweet about the new meetup was just a simple line away:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Twitter.update("Come on out to our Ruby Motion meetup next Tuesday @ 6:30pm!")</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now for finding relevant people:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>nyc_accounts = {}
+</span><span class='line'>index = 0
+</span><span class='line'>cursor = -1
+</span><span class='line'>
+</span><span class='line'># Loop through pages 1-10
+</span><span class='line'>while index &lt;15 do
+</span><span class='line'>    
+</span><span class='line'>    # Iterate through followes
+</span><span class='line'>    followers = Twitter.followers("RubyMotion", :cursor =&gt; -1)
+</span><span class='line'>
+</span><span class='line'>    # Save the users 
+</span><span class='line'>    followers.users.each do |user|
+</span><span class='line'>      rubymotion_accounts[user.screen_name] = user.location if user.location.downcase =~ /(nyc|york)/i
+</span><span class='line'>    end
+</span><span class='line'>
+</span><span class='line'>    cursor = followers.next_cursor
+</span><span class='line'>    index+=1
+</span><span class='line'>end</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The code above makes a call to the Twitter API to grab the followers for a sprcific Twitter account, in this case RubyMotion.  The way the Twitter API works, each call returns an object that contains an array of 20 seperate hashes, which contain information about each of the followers. Because the API rate limits of the Twitter API are relatively small, I decided to loop through only 15 pages of followers.</p>
+
+<p>Next, I went through each Twitter object and added the username and location of the follower if the location contained either nyc or york (using regular expressions). The result is a hash where the keys are usernames and the values are locations for, containing information of people that follow RubyMotion and have a location that contains either &lsquo;NYC&rsquo; or &lsquo;York&rsquo;.</p>
+
+<p>On to the next one:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>rubymotion_accounts_2 = {}
+</span><span class='line'>
+</span><span class='line'>Twitter.search("#rubymotion", :count =&gt; 100, :result_type =&gt; "recent").results.each do |status|
+</span><span class='line'>  rubymotion_accounts_2[status.attrs[:user][:screen_name]]=status.attrs[:user][:location] if status.attrs[:user][:location].downcase =~ /(nyc|york)/i
+</span><span class='line'>end
 </span></code></pre></td></tr></table></div></figure>
 
 
-<blockquote><p>Don&rsquo;t Panic. <br/>
-<strong>Douglas Adams</strong> &ndash; The Hitchhiker&rsquo;s Guide to the Galaxy</p></blockquote>
+<p>For the second call, I a utilizing the search method, and querying the most recent 100 tweets that contain the #rubymotion tag.  This call returns a Twitter object that contains an array of all the tweets.  Each item of the array contains a hash with information about the user.  I then saved the username and location of the tweeter if the location of that person contained &lsquo;NYC&rsquo; or &lsquo;York&rsquo; again.</p>
 
-<blockquote><p>Don&#8217;t Panic.</p><footer><strong>Douglas Adams</strong> <cite>The Hitchhiker&#8217;s Guide to the Galaxy</cite></footer></blockquote>
+<p>Saving the data into a database:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>require "sqlite3"
+</span><span class='line'>require 'open-uri'
+</span><span class='line'>
+</span><span class='line'>db = SQLite3::Database.new "twitter-bot.db"
+</span><span class='line'>
+</span><span class='line'>db.execute &lt;&lt;-SQL
+</span><span class='line'> 
+</span><span class='line'>  create table twitter_handles (
+</span><span class='line'>    id INTEGER PRIMARY KEY AUTOINCREMENT,
+</span><span class='line'>    twitter_handle TEXT,
+</span><span class='line'>    city TEXT
+</span><span class='line'>  );
+</span><span class='line'>SQL
+</span><span class='line'>
+</span><span class='line'>rubymotion_accounts.each do |handle, city|
+</span><span class='line'>  db.execute("INSERT INTO twitter_handles (twitter_handle, city) 
+</span><span class='line'>              VALUES (?, ?)", [handle, city])
+</span><span class='line'>end
+</span><span class='line'>
+</span><span class='line'>rubymotion_accounts_2.each do |handle, city|
+</span><span class='line'>  db.execute("INSERT INTO twitter_handles (twitter_handle, city) 
+</span><span class='line'>              VALUES (?, ?)", [handle, city])
+</span><span class='line'>end</span></code></pre></td></tr></table></div></figure>
 
 
-<p><a href="www.google.com">google</a></p>
+<p>Lastly, I wrote a schema.rb file to create a table and iterate through the 2 hashes I created above and insert the information into the new data.</p>
+
+<h3>Areas of Future Exploration</h3>
+
+<p>One problem I kept on running into was exceeding my API rate limit.  For example, in the first API call, the reason I only scroll through 15 pages is because that Twitter API only allows me to make that call 15 times within a 15 minute span.  While finding 300 relevant people seems like a lot, when you add the location constraint is ends of not being that many people.  Similarly in the 2nd API call, I only grab the last 100 tweets because that is all the API lets me grab at a time.  This made if really hard to find many people that were relevant for this specific search.  When I ran this search I ended up with no results because of the 100 tweets it grabbed, no users were located in New York.</p>
 </div>
   
   
@@ -132,7 +279,7 @@ Hello World Don&rsquo;t Panic. Douglas Adams &ndash; The Hitchhiker&rsquo;s Guid
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2013/06/17/building-a-twitter-bot/">Building a Twitter Bot</a>
+        <a href="/blog/2013/06/17/building-a-twitter-bot/">Using the Twitter API to Find People on Twitter</a>
       </li>
     
   </ul>
