@@ -28,14 +28,14 @@ In addition to finding people that match either of the criteria above, I also wa
 
 I first looked into the best way to access the Twitter API from a ruby environment.  As Twitter is a very popular app, I figured that there was a pretty good gem.  After searching for 'Twitter' on <a href="https://ruby-toolbox.com">www.ruby-toolbox.com</a>, I ended up deciding to go with the 'Twitter' gem.  After installing this gem in the terminal, I required the rubygems gem and twitter gem in my ruby file.  
 
-```
+``` ruby
 require 'rubygems'
 require 'twitter'
 ```
 
 Next I read the gem documentation on <a href="https://github.com/sferik/twitter">github</a>, and followed the steps to register and authorize my app.  After registering my app on the <a href="https://dev.twitter.com/apps/new">Twitter Developer site</a>, it was just a few lines of adding my app keys before I was up and running.
 
-```
+``` ruby
 Twitter.configure do |config|
   config.consumer_key = "**********************"
   config.consumer_secret = "*****************************************"
@@ -46,13 +46,13 @@ end
 
 Now I was up and running!  To tweet about the new meetup was just a simple line away: 
 
-```
+``` ruby
 Twitter.update("Come on out to our Ruby Motion meetup next Tuesday @ 6:30pm!")
 ```
 
 Now for finding relevant people:
 
-```
+``` ruby
 nyc_accounts = {}
 index = 0
 cursor = -1
@@ -79,7 +79,7 @@ Next, I went through each Twitter object and added the username and location of 
 
 On to the next one:
 
-```
+``` ruby
 rubymotion_accounts_2 = {}
 
 Twitter.search("#rubymotion", :count => 100, :result_type => "recent").results.each do |status|
@@ -92,7 +92,7 @@ For the second call, I a utilizing the search method, and querying the most rece
 
 Saving the data into a database:
 
-```
+``` ruby
 require "sqlite3"
 require 'open-uri'
 
