@@ -4,7 +4,7 @@
   <title><![CDATA[Build, Break, Learn.]]></title>
   <link href="http://awaxman11.github.io/atom.xml" rel="self"/>
   <link href="http://awaxman11.github.io/"/>
-  <updated>2013-06-19T09:03:05-04:00</updated>
+  <updated>2013-06-19T09:28:39-04:00</updated>
   <id>http://awaxman11.github.io/</id>
   <author>
     <name><![CDATA[Adam Waxman]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Using the Twitter API to Find People on Twitter]]></title>
-    <link href="http://awaxman11.github.io/blog/2013/06/17/building-a-twitter-bot/"/>
+    <link href="http://awaxman11.github.io/blog/2013/06/17/twitter-api/"/>
     <updated>2013-06-17T00:12:00-04:00</updated>
-    <id>http://awaxman11.github.io/blog/2013/06/17/building-a-twitter-bot</id>
+    <id>http://awaxman11.github.io/blog/2013/06/17/twitter-api</id>
     <content type="html"><![CDATA[<h4>Inspiration</h4>
 
 <p>Over the last year I&rsquo;ve become a huge Twitter fan.  So much so that I had to move it off the front page of my phone so I wouldn&rsquo;t be (as) distracted throughout the day.  In addition to my personal account, I have several accounts for projects I&rsquo;m working on.  I use these accounts to discover and interact with people that may be interested in these apps.</p>
@@ -48,29 +48,31 @@
 
 <p>Next I read the gem documentation on <a href="https://github.com/sferik/twitter">github</a>, and followed the steps to register and authorize my app.  After registering my app on the <a href="https://dev.twitter.com/apps/new">Twitter Developer site</a>, it was just a few lines of code before I was up and running.</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Twitter.configure do |config|
-</span><span class='line'>  config.consumer_key = "**********************"
-</span><span class='line'>  config.consumer_secret = "*****************************************"
-</span><span class='line'>  config.oauth_token = "**************************************************"
-</span><span class='line'>  config.oauth_token_secret = "*****************************************"
-</span><span class='line'>end</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Twitter</span><span class="o">.</span><span class="n">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">consumer_key</span> <span class="o">=</span> <span class="s2">&quot;**********************&quot;</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">consumer_secret</span> <span class="o">=</span> <span class="s2">&quot;*****************************************&quot;</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">oauth_token</span> <span class="o">=</span> <span class="s2">&quot;**************************************************&quot;</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">oauth_token_secret</span> <span class="o">=</span> <span class="s2">&quot;*****************************************&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Now I was up and running!  To tweet about the new meetup was just a simple line away:</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Twitter.update("Come on out to our Ruby Motion meetup next Tuesday @ 6:30pm!")</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Twitter</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;Come on out to our Ruby Motion meetup next Tuesday @ 6:30pm!&quot;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Now for finding relevant people:</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -88,24 +90,25 @@
 <span class='line-number'>16</span>
 <span class='line-number'>17</span>
 <span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>nyc_accounts = {}
-</span><span class='line'>index = 0
-</span><span class='line'>cursor = -1
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">nyc_accounts</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span class='line'><span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'><span class="n">cursor</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 </span><span class='line'>
-</span><span class='line'># Loop through pages 1-10
-</span><span class='line'>while index &lt;15 do
-</span><span class='line'>    
-</span><span class='line'>    # Iterate through followes
-</span><span class='line'>    followers = Twitter.followers("RubyMotion", :cursor =&gt; -1)
+</span><span class='line'><span class="c1"># Loop through pages 1-10</span>
+</span><span class='line'><span class="k">while</span> <span class="n">index</span> <span class="o">&lt;</span><span class="mi">15</span> <span class="k">do</span>
 </span><span class='line'>
-</span><span class='line'>    # Save the users 
-</span><span class='line'>    followers.users.each do |user|
-</span><span class='line'>      rubymotion_accounts[user.screen_name] = user.location if user.location.downcase =~ /(nyc|york)/i
-</span><span class='line'>    end
+</span><span class='line'>    <span class="c1"># Iterate through followes</span>
+</span><span class='line'>    <span class="n">followers</span> <span class="o">=</span> <span class="no">Twitter</span><span class="o">.</span><span class="n">followers</span><span class="p">(</span><span class="s2">&quot;RubyMotion&quot;</span><span class="p">,</span> <span class="ss">:cursor</span> <span class="o">=&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 </span><span class='line'>
-</span><span class='line'>    cursor = followers.next_cursor
-</span><span class='line'>    index+=1
-</span><span class='line'>end</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>    <span class="c1"># Save the users </span>
+</span><span class='line'>    <span class="n">followers</span><span class="o">.</span><span class="n">users</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">user</span><span class="o">|</span>
+</span><span class='line'>      <span class="n">rubymotion_accounts</span><span class="o">[</span><span class="n">user</span><span class="o">.</span><span class="n">screen_name</span><span class="o">]</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">location</span> <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">downcase</span> <span class="o">=~</span> <span class="sr">/(nyc|york)/i</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">cursor</span> <span class="o">=</span> <span class="n">followers</span><span class="o">.</span><span class="n">next_cursor</span>
+</span><span class='line'>    <span class="n">index</span><span class="o">+=</span><span class="mi">1</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>The code above makes a call to the Twitter API to grab the followers for a sprcific Twitter account, in this case RubyMotion.  The way the Twitter API works, each call returns an object that contains an array of 20 seperate hashes, which contain information about each of the followers. Because the API rate limits of the Twitter API are relatively small, I decided to loop through only 15 pages of followers.</p>
@@ -114,24 +117,26 @@
 
 <p>On to the next one:</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>rubymotion_accounts_2 = {}
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rubymotion_accounts_2</span> <span class="o">=</span> <span class="p">{}</span>
 </span><span class='line'>
-</span><span class='line'>Twitter.search("#rubymotion", :count =&gt; 100, :result_type =&gt; "recent").results.each do |status|
-</span><span class='line'>  rubymotion_accounts_2[status.attrs[:user][:screen_name]]=status.attrs[:user][:location] if status.attrs[:user][:location].downcase =~ /(nyc|york)/i
-</span><span class='line'>end
+</span><span class='line'><span class="no">Twitter</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;#rubymotion&quot;</span><span class="p">,</span> <span class="ss">:count</span> <span class="o">=&gt;</span> <span class="mi">100</span><span class="p">,</span> <span class="ss">:result_type</span> <span class="o">=&gt;</span> <span class="s2">&quot;recent&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">status</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">rubymotion_accounts_2</span><span class="o">[</span><span class="n">status</span><span class="o">.</span><span class="n">attrs</span><span class="o">[</span><span class="ss">:user</span><span class="o">][</span><span class="ss">:screen_name</span><span class="o">]]=</span><span class="n">status</span><span class="o">.</span><span class="n">attrs</span><span class="o">[</span><span class="ss">:user</span><span class="o">][</span><span class="ss">:location</span><span class="o">]</span> <span class="k">if</span> <span class="n">status</span><span class="o">.</span><span class="n">attrs</span><span class="o">[</span><span class="ss">:user</span><span class="o">][</span><span class="ss">:location</span><span class="o">].</span><span class="n">downcase</span> <span class="o">=~</span> <span class="sr">/(nyc|york)/i</span>
+</span><span class='line'><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure>
 
+
+<p></p>
 
 <p>For the second call, I a utilizing the search method, and querying the most recent 100 tweets that contain the #rubymotion tag.  This call returns a Twitter object that contains an array of all the tweets.  Each item of the array contains a hash with information about the user.  I then saved the username and location of the tweeter if the location of that person contained &lsquo;NYC&rsquo; or &lsquo;York&rsquo; again.</p>
 
 <p>Saving the data into a database:</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -154,29 +159,30 @@
 <span class='line-number'>21</span>
 <span class='line-number'>22</span>
 <span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>require "sqlite3"
-</span><span class='line'>require 'open-uri'
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s2">&quot;sqlite3&quot;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;open-uri&#39;</span>
 </span><span class='line'>
-</span><span class='line'>db = SQLite3::Database.new "twitter-bot.db"
+</span><span class='line'><span class="n">db</span> <span class="o">=</span> <span class="ss">SQLite3</span><span class="p">:</span><span class="ss">:Database</span><span class="o">.</span><span class="n">new</span> <span class="s2">&quot;twitter-bot.db&quot;</span>
 </span><span class='line'>
-</span><span class='line'>db.execute &lt;&lt;-SQL
-</span><span class='line'> 
-</span><span class='line'>  create table twitter_handles (
-</span><span class='line'>    id INTEGER PRIMARY KEY AUTOINCREMENT,
-</span><span class='line'>    twitter_handle TEXT,
-</span><span class='line'>    city TEXT
-</span><span class='line'>  );
-</span><span class='line'>SQL
+</span><span class='line'><span class="n">db</span><span class="o">.</span><span class="n">execute</span> <span class="o">&lt;&lt;-</span><span class="no">SQL</span>
+</span><span class='line'><span class="sh"> </span>
+</span><span class='line'><span class="sh">  create table twitter_handles (</span>
+</span><span class='line'><span class="sh">    id INTEGER PRIMARY KEY AUTOINCREMENT,</span>
+</span><span class='line'><span class="sh">    twitter_handle TEXT,</span>
+</span><span class='line'><span class="sh">    city TEXT</span>
+</span><span class='line'><span class="sh">  );</span>
+</span><span class='line'><span class="no">SQL</span>
 </span><span class='line'>
-</span><span class='line'>rubymotion_accounts.each do |handle, city|
-</span><span class='line'>  db.execute("INSERT INTO twitter_handles (twitter_handle, city) 
-</span><span class='line'>              VALUES (?, ?)", [handle, city])
-</span><span class='line'>end
+</span><span class='line'><span class="n">rubymotion_accounts</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">handle</span><span class="p">,</span> <span class="n">city</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO twitter_handles (twitter_handle, city) </span>
+</span><span class='line'><span class="s2">              VALUES (?, ?)&quot;</span><span class="p">,</span> <span class="o">[</span><span class="n">handle</span><span class="p">,</span> <span class="n">city</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span>
 </span><span class='line'>
-</span><span class='line'>rubymotion_accounts_2.each do |handle, city|
-</span><span class='line'>  db.execute("INSERT INTO twitter_handles (twitter_handle, city) 
-</span><span class='line'>              VALUES (?, ?)", [handle, city])
-</span><span class='line'>end</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="n">rubymotion_accounts_2</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">handle</span><span class="p">,</span> <span class="n">city</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO twitter_handles (twitter_handle, city) </span>
+</span><span class='line'><span class="s2">              VALUES (?, ?)&quot;</span><span class="p">,</span> <span class="o">[</span><span class="n">handle</span><span class="p">,</span> <span class="n">city</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Lastly, I wrote a schema.rb file to create a table and iterate through the 2 hashes I created above and insert the information into the new data.</p>
