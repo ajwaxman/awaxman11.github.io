@@ -8,34 +8,34 @@ categories:
 
 #### Inspiration
 
-Over the last year I've become obsessed with Twitter.  So much so that I had to move it off the front page of my phone so I wouldn't be (as) distracted throughout the day.  In addition to my personal account, I have several accounts for apps I'm working on.  I use these accounts to discover and interact with people that may be interested in these apps.
+Over the last year I've become a huge Twitter fan.  So much so that I had to move it off the front page of my phone so I wouldn't be (as) distracted throughout the day.  In addition to my personal account, I have several accounts for projects I'm working on.  I use these accounts to discover and interact with people that may be interested in these apps.
 
-To discover people that I think may be interested, I look recent follwoers of similar apps.  While this process worked alright, it was a very manual.  Also, one of the apps I'm working on is only available in NYC, and there was no way to search for people only living in NYC and the surrounding area.
+To discover people that I think may be interested, I look at recent followers of similar apps.  While this process worked alright, it was a very manual.  Also, one of the apps I'm working on is only available in NYC, and there was no way to search for people only living in NYC and the surrounding area.
 
 
 #### Using the Twitter API
 
-I decided that I could use the Twitter API to help automate this process.  For example, let's pretend that I am creating a Twitter account for a Ruby Motion meetup in NYC.  I'd like to find people in the NYC area that are interested in Ruby Motion.  I can find these people a couple of different ways:
+I decided that I could use the Twitter API to help automate this process.  For example, let's pretend that I am creating starting a Ruby Motion meetup in NYC.  I'd like to find people in the NYC area that are interested in Ruby Motion.  Using Twitter, I can find these people a couple of different ways:
 
 <ol style="margin-left: 30px;">
   <li>Look for people that follow @RubyMotion</li>
-  <li>Look for people that recently tweeted"#rubymotion"</li>
+  <li>Look for people that recently tweeted "#rubymotion"</li>
 </ol>
 
 In addition to finding people that match either of the criteria above, I also want to make sure they live in the NYC area.  
 
 #### Getting Started
 
-I first looked into the best way to access the Twitter API from a ruby environment.  As Twitter is a very popular app, I figured that there was a pretty good gem.  After searching for 'Twitter' on <a href="https://ruby-toolbox.com">www.ruby-toolbox.com</a>, I ended up deciding to go with the 'Twitter' gem.  After installing this gem in the terminal, I required the rubygems gem and twitter gem in my ruby file.  
+I first looked into the best way to access the Twitter API from a ruby environment.  As Twitter is a very popular app, I figured there was likely a good gem.  After searching for 'Twitter' on <a href="https://ruby-toolbox.com">www.ruby-toolbox.com</a>, I ended up deciding to go with the 'Twitter' gem.  After installing this gem in the terminal, I required the rubygems gem and twitter gem in my ruby file.  
 
 ```
 require 'rubygems'
 require 'twitter'
 ```
 
-Next I read the gem documentation on <a href="https://github.com/sferik/twitter">github</a>, and followed the steps to register and authorize my app.  After registering my app on the <a href="https://dev.twitter.com/apps/new">Twitter Developer site</a>, it was just a few lines of adding my app keys before I was up and running.
+Next I read the gem documentation on <a href="https://github.com/sferik/twitter">github</a>, and followed the steps to register and authorize my app.  After registering my app on the <a href="https://dev.twitter.com/apps/new">Twitter Developer site</a>, it was just a few lines of code before I was up and running.
 
-```
+``` ruby
 Twitter.configure do |config|
   config.consumer_key = "**********************"
   config.consumer_secret = "*****************************************"
@@ -46,13 +46,13 @@ end
 
 Now I was up and running!  To tweet about the new meetup was just a simple line away: 
 
-```
+``` ruby
 Twitter.update("Come on out to our Ruby Motion meetup next Tuesday @ 6:30pm!")
 ```
 
 Now for finding relevant people:
 
-```
+``` ruby
 nyc_accounts = {}
 index = 0
 cursor = -1
@@ -79,20 +79,20 @@ Next, I went through each Twitter object and added the username and location of 
 
 On to the next one:
 
-```
+``` ruby
 rubymotion_accounts_2 = {}
 
 Twitter.search("#rubymotion", :count => 100, :result_type => "recent").results.each do |status|
   rubymotion_accounts_2[status.attrs[:user][:screen_name]]=status.attrs[:user][:location] if status.attrs[:user][:location].downcase =~ /(nyc|york)/i
 end
 
-```
+``` 
 
 For the second call, I a utilizing the search method, and querying the most recent 100 tweets that contain the #rubymotion tag.  This call returns a Twitter object that contains an array of all the tweets.  Each item of the array contains a hash with information about the user.  I then saved the username and location of the tweeter if the location of that person contained 'NYC' or 'York' again.  
 
 Saving the data into a database:
 
-```
+``` ruby
 require "sqlite3"
 require 'open-uri'
 
