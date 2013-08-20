@@ -7,7 +7,7 @@ title: Build, Break, Learn.
 subtitle: Adam Waxman's Octopress Blog
 author: Adam Waxman
 simple_search: http://google.com/search
-description: Philosopher turned banker turned coder.  Learning how to build stuff at the Flatiron School.
+description: Building <a href="http://flockwithme.com">@flockwme</a> and learning <a href="http://flatironschool.com">@flatironschool</a>.
 
 # Default date format is "ordinal" (resulting in "July 22nd 2007")
 # You can customize the format as defined in
@@ -91,8 +91,8 @@ delicious_user:
 delicious_count: 3
 
 # Disqus Comments
-disqus_short_name:
-disqus_show_comment_count: false
+disqus_short_name: awaxman-coding
+disqus_show_comment_count: true
 
 # Google Analytics
 google_analytics_tracking_id: 

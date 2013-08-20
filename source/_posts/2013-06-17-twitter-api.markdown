@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Using the Twitter API to Find People on Twitter"
+title: "Using the Twitter API to Find People"
 date: 2013-06-17 00:12
 comments: true
 categories: 

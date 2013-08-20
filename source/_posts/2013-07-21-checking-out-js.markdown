@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Learning about AJAX"
+title: "How jQuery and AJAX Actually Work"
 date: 2013-07-21 23:13
 comments: true
 categories: 
