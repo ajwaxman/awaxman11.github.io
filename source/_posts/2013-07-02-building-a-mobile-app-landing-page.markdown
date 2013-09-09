@@ -3,7 +3,7 @@ layout: post
 title: "Building a Mobile App Landing Page"
 date: 2013-07-02 12:50
 comments: true
-categories: 
+categories: responsive, twilio, ruby
 ---
 
 Over the last year I've been working on a mobile app called Flock. To get ready for our launch, I created a new <a href="http://flockwithme.com">landing page</a> to allow people to easily download the app.  On a desktop browser, it allows people to input their phone number and receive a text on their phone with a link to download the app.  On a mobile device, it allows people to download the app directly.

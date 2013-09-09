@@ -3,7 +3,7 @@ layout: post
 title: "How jQuery and AJAX Actually Work"
 date: 2013-07-21 23:13
 comments: true
-categories: 
+categories: javascript
 ---
 
 As someone who loves UX and design, it is not surprising that I've been wanting to learn about JavaScript - the language of the browser that allows for cool client side interactions. I've used many JS libraries, but wanted to dive deeper into AJAX. Before today I didn't even know what it meant, just that it was something I wanted to know more about.

@@ -3,7 +3,7 @@ layout: post
 title: "What is the difference between a block, a proc, and a lambda in ruby?"
 date: 2013-08-05 23:52
 comments: true
-categories: 
+categories: ruby
 ---
 
 ### What are blocks, procs, and lambdas? ###
