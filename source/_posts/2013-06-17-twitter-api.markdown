@@ -3,7 +3,7 @@ layout: post
 title: "Using the Twitter API to Find People"
 date: 2013-06-17 00:12
 comments: true
-categories: twitter, ruby
+categories: twitter ruby
 ---
 
 #### Inspiration

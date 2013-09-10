@@ -3,7 +3,7 @@ layout: post
 title: "Deploying a Rails App With Capistrano (Part 1)"
 date: 2013-09-09 12:03
 comments: true
-categories: ruby, capistrano
+categories: ruby capistrano
 ---
 
 I recently graduated from the Flatiron School, where I worked on a 6-week long project with a group of 3 other students.  Our project, [HireMe](https://github.com/awaxman11/HireMe), is a CRM platform to help manage the interview process. We built the app using Rails and deployed it onto a cloud server using Capistrano (along with Nginx and Passenger). For side projects I've used Heroku, so this was my first time deploying to my own server.
@@ -16,19 +16,19 @@ Capistrano is a remote server automation and deployment tool written in ruby. Pu
 
 The first step in using capitstrano is installing the capistrano gem on your local machine. Capistrano only requires that your have access to your server via Secure Shell (SSH).
 
-```
+```bash
 gem install capistrano
 ```
 
 Once the gem is installed the next step is to cd into your repository's directory and run the following command:
 
-```
+```bash
 capify .
 ```
 
 This creates a Capfile, which is where Capistrano reads instructions from. This is what it looks like out of the package:
 
-```
+```ruby
 load 'deploy'
 # Uncomment if you are using Rails' asset pipeline
     # load 'deploy/assets'
@@ -39,7 +39,7 @@ The capify command also creates a file in the config directory called deploy.rb,
 
 Below is the default deploy.rb file: 
 
-```
+```ruby
 set :application, "set your application name here"
 set :repository,  "set your repository location here"
 
@@ -69,7 +69,7 @@ role :db,  "your slave db-server here"
 
 We worked off of an awesome deployment guide by [Spike Grobstein](https://twitter.com/spike666) that recommended starting with the following deploy.rb file: 
 
-```
+```ruby
 require 'bundler/capistrano' # for bundler support
 
 set :application, "set your application name here"
@@ -104,12 +104,12 @@ end
 
 This version differs slightly from the default deploy.rb file, namely adding lines to set the user information, where to deploy to, and a couple other small settings. Below are some exaplanations of each of the lines in this file.
 
-```
+```ruby
 set :application, "studentbody"
 ```
 This code sets the application variable.  It will become the name of the overarching folder on the server and is also used in the deploy_to location a couple lines below.
 
-```
+```ruby
 set :repository,  "set your repository location here"
 
 #example
@@ -117,23 +117,23 @@ set :repository,  "git@github.com:YourGithubUsername/ExampleRepo.git"
 ```
 The repository variable tells Capistrano where to find your code.  We used a github hosted repository.
 
-```
+```ruby
 set :user, 'USERNAME'
 ```
 The above line sets the name of the user we are deploying as.  For example if you are SSHing into your server with the following command 'ssh example@192.241.555.55' then you'd set :user to example.
 
-```
+```ruby
 set :deploy_to, "/home/#{ user }/#{ application }"
 ```
 
 This command sets the location of deployment.  In the case where the the user is jsmith11 and the app name is example-app, the above code would deploy the app to '/home/jsmith11/example-app' directory on the remote server.
 
-```
+```ruby
 set :use_sudo, false
 ```
 The user_sudo variable tells Capistrano whether or not to prefix sudo infront of all commands. Sudo is a prefix that allows you to run programs with the security priveledges of another user (commonly used with the superuser/root). In our case we were deploying to a location that our user owned, so we set this to false. 
 
-```
+```ruby
 set :scm, :git
 ```
 
