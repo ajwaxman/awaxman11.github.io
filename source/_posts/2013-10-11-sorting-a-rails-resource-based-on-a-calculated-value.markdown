@@ -19,7 +19,7 @@ I got to a point where I wanted sort the items by number of days left until the 
 
 If I had a column in the database called 'days_until_due' I could have used the order method:
 
-```
+```ruby
 Reminder.order('days_until_due ASC')
 ```
 
@@ -35,7 +35,7 @@ After googling around I stumbled upon a nice solution. It suggested creating an 
 
 In reminder.rb, I created an instance method to find out how many days until the item is due based on the day of the month the item was suppoed to be completed by and the current date:
 
-```
+```ruby
 def days_until_due
   today = Time.now
   simple_today = Time.new(today.year, today.month, today.day)
@@ -52,21 +52,21 @@ end
 
 Again in reminder.rb, I then created a class method, which combined a query, sort_by, and the instance method from above.
 
-```
+```ruby
 def self.sorted_by_days_until_due
   Reminder.all.sort_by(&:days_until_due)
 end
 ```
 You may be asking yourself what is going on in that one line method? Let's break it down step by step. First, Reminder.all returns an array of all the reminders (unsorted).
 
-```
+```ruby
 Reminder.all.class # => Array
 ```
 
 Next, I call the sort_by method on this array. This method takes a block as an argument and generates a sorted array by mapping the values through the given block. If no block is given, an enumerator is returned instead. Below is an example: 
 
-```
-array = ["Michael", "Adam, "Jen"]
+```ruby
+array = ["Michael", "Adam", "Jen"]
 
 array.sort_by{|word| word.length} # => ["Jen", "Adam", "Michael"] 
 
@@ -77,8 +77,8 @@ Now you're probably asking yourself, but how does '&:days_until_due' translate i
 
 Below I will make the example above look like the method I used in my reminder app.
 
-```
-array = ["Michael", "Adam, "Jen"]
+```ruby
+array = ["Michael", "Adam", "Jen"]
 
 # Passing in a block directly
 array.sort_by{|word| word.length} # => ["Jen", "Adam", "Michael"] 
@@ -95,7 +95,7 @@ The above syntax works by combining implicit type casting with the '&' operator.
 
 Going back to my original problem, all this talk about procs and blocks and type casting is what allowed me to create the following one line method:
 
-```
+```ruby
 def self.sorted_by_days_until_due
   Reminder.all.sort_by(&:days_until_due)
 end
@@ -103,7 +103,7 @@ end
 
 This method allowed me to succinctly include a sorted array of reminders in my view with the following: 
 
-```
+```ruby
 @reminders = Reminder.sorted_by_days_until_due
 ```
 
