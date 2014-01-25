@@ -15,7 +15,7 @@ Being a hackathon project, we wanted to keep the app simple. It contained a Remi
 
 ### The Problem
 
-I got to a point where I wanted sort the items by number of days left until the item was due. 
+I got to a point where I wanted to sort the items by number of days left until the item was due. 
 
 If I had a column in the database called 'days_until_due' I could have used the order method:
 
