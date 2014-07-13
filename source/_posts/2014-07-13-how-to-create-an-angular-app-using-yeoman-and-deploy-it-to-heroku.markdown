@@ -102,27 +102,5 @@ You need at least 1 web worker to get your app running. You can scale your Herok
 
 Ta da, now your app should be running at <your_app_name>.herokuapp.com. To quickly open your app run `heroku open`
 
-#### Other: Get Icon Fonts to Work
-
-If you pay close attention to the index of the app so far, you may notice that something does not look quite right on the index page of the app. Most notably on the main green button there is a weird square after 'Splendid!'
-
-![](http://cl.ly/WXtu/Image%202014-07-13%20at%204.17.49%20PM.png)
-
-This is because the icon fonts are not working properly. For me, the fix was to change the first line of main.scss, which can be found [here](http://cl.ly/WZ7K).
-
-For me, the line originally is:
-```css
-$icon-font-path: "../bower_components/bootstrap-sass-official/vendor/assets/fonts/bootstrap/";
-```
-
-But if you follow the directions of that line you don't end up in the correct bootstrap font folder. Rather, the line should read: 
-```css
-$icon-font-path: "../../bower_components/bootstrap-sass-official/assets/fonts/bootstrap/";
-```
-
-Now stop your server, run `grunt server` and refresh localhost:9000. The button icon should now be showing up:
-
-![](http://cl.ly/WXmN/Image%202014-07-13%20at%204.18.07%20PM.png)
-
 Let me know if you have any questions or any problems while setting up and deploying your app!
 
