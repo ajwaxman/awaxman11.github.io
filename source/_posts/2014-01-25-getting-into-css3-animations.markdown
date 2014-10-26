@@ -6,7 +6,7 @@ comments: true
 categories: frontend css animation design
 ---
 
-I recently had the opprtunity to dive into some CSS3 animations. I've used libraries like [animate.css](animate.css) and done animations with javascript, but never did any custom CSS3 work.
+I recently had the opprtunity to dive into some CSS3 animations. I've used libraries like [animate.css](animate.css) and done animations with javascript, but never did any custom CSS3 work
 
 #### The Task
 
