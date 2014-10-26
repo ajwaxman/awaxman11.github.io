@@ -4,7 +4,7 @@
   <title><![CDATA[Build, Break, Learn.]]></title>
   <link href="http://awaxman11.github.io/atom.xml" rel="self"/>
   <link href="http://awaxman11.github.io/"/>
-  <updated>2014-10-26T11:35:27-04:00</updated>
+  <updated>2014-10-26T11:36:18-04:00</updated>
   <id>http://awaxman11.github.io/</id>
   <author>
     <name><![CDATA[Adam Waxman]]></name>
@@ -846,7 +846,7 @@ ruby</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>The above line sets the name of the user we are deploying as.  For example if you are SSHing into your server with the following command &lsquo;ssh <a href="&#109;&#97;&#105;&#108;&#x74;&#111;&#58;&#101;&#120;&#x61;&#109;&#112;&#x6c;&#101;&#64;&#49;&#57;&#50;&#46;&#x32;&#52;&#x31;&#46;&#x35;&#53;&#x35;&#x2e;&#53;&#53;">&#101;&#x78;&#97;&#x6d;&#x70;&#x6c;&#101;&#x40;&#x31;&#x39;&#50;&#46;&#x32;&#52;&#x31;&#x2e;&#53;&#x35;&#x35;&#46;&#53;&#53;</a>&rsquo; then you&rsquo;d set :user to example.</p>
+<p>The above line sets the name of the user we are deploying as.  For example if you are SSHing into your server with the following command &lsquo;ssh <a href="&#109;&#x61;&#105;&#x6c;&#x74;&#111;&#x3a;&#101;&#x78;&#x61;&#x6d;&#x70;&#108;&#x65;&#64;&#49;&#57;&#50;&#x2e;&#x32;&#52;&#x31;&#46;&#53;&#53;&#53;&#46;&#x35;&#x35;">&#101;&#x78;&#x61;&#x6d;&#x70;&#108;&#101;&#x40;&#x31;&#57;&#50;&#46;&#x32;&#x34;&#49;&#46;&#x35;&#53;&#x35;&#46;&#53;&#53;</a>&rsquo; then you&rsquo;d set :user to example.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">set</span> <span class="ss">:deploy_to</span><span class="p">,</span> <span class="s2">&quot;/home/</span><span class="si">#{</span> <span class="n">user</span> <span class="si">}</span><span class="s2">/</span><span class="si">#{</span> <span class="n">application</span> <span class="si">}</span><span class="s2">&quot;</span>
