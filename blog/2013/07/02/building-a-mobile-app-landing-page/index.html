@@ -1,0 +1,575 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Building a Mobile App Landing Page - Build, Break, Learn.</title>
+  <meta name="author" content="Adam Waxman">
+
+  
+  <meta name="description" content="Over the last year I&rsquo;ve been working on a mobile app called Flock. To get ready for our launch, I created a new landing page to allow people to &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://awaxman11.github.io/blog/2013/07/02/building-a-mobile-app-landing-page/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Build, Break, Learn." type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-43029008-1', 'awaxman11.github.io');
+  ga('send', 'pageview');
+
+</script>
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Build, Break, Learn.</a></h1>
+  
+    <h2>Adam Waxman's technical blog</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:awaxman11.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Building a Mobile App Landing Page</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-02T12:50:00-04:00" pubdate data-updated="true">Jul 2<span>nd</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Over the last year I&rsquo;ve been working on a mobile app called Flock. To get ready for our launch, I created a new <a href="http://flockwithme.com">landing page</a> to allow people to easily download the app.  On a desktop browser, it allows people to input their phone number and receive a text on their phone with a link to download the app.  On a mobile device, it allows people to download the app directly.</p>
+
+<p><img src="/images/Launch-site-blog-image.png"></p>
+
+<h4>The Ingredients</h4>
+
+<ul style="margin-left: 30px;">
+  <li><a href="http://twilio.com">Twilio</a>: An API to make and receive phone calls and send and receive text messages. I used this service to send a text message to desktop users containing a link to download the app.</li>
+  <li><a href="http://fancyapps.com/fancybox/">fancyBox</a>: Tool for displaying images, html content and multi-media in a Mac-style &#8220;lightbox&#8221; that floats overtop of web page</li>
+  <li><a href="http://tympanus.net/Development/CreativeButtons/">Creative Buttons</a>: Button inspirations from Codrops</li>
+  <li>SASS/Bourbon/Neat:
+    <ul>
+      <li><a href="http://sass-lang.com/">SASS</a>: A CSS extension that adds nested rules, variables, mixins, and selector inheritance</li>
+      <li><a href="http://bourbon.io/">Bourbon</a>: A mixin library for SASS</li>
+      <li><a href="http://neat.bourbon.io/">Neat</a>: A grid framework for SASS with Bourbon</li>
+    </ul>
+  </li>
+</ul>
+
+
+<h4>Sending a Text</h4>
+
+<p>My first step was to get the text message part of the landing page working.  High level I wanted to be able to send users a text message with a link to download Flock on their iPhone.  To do this, I created a form to collect a user&rsquo;s phone number, and then utilized a Twilio gem to send a message to the collected number.</p>
+
+<p>Using the &lsquo;twilio-ruby&rsquo; gem I was able to get a text message up and running relatively quickly by creating a form and adding the Twilio logic in the route associated with that form.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">def</span> <span class="nf">send_text</span>
+</span><span class='line'>    <span class="n">number</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="ss">:number</span><span class="o">]</span> <span class="c1"># grab user&#39;s number from form and assign to &#39;number&#39; variable</span>
+</span><span class='line'>    <span class="n">account_sid</span> <span class="o">=</span> <span class="s1">&#39;**********************************&#39;</span> <span class="c1"># received after creating an account with Twilio</span>
+</span><span class='line'>    <span class="n">auth_token</span> <span class="o">=</span> <span class="s1">&#39;********************************&#39;</span> <span class="c1"># same as above</span>
+</span><span class='line'>    <span class="vi">@client</span> <span class="o">=</span> <span class="ss">Twilio</span><span class="p">:</span><span class="ss">:REST</span><span class="o">::</span><span class="no">Client</span><span class="o">.</span><span class="n">new</span> <span class="n">account_sid</span><span class="p">,</span> <span class="n">auth_token</span> <span class="c1"># create a Twilio client (used to send messages)</span>
+</span><span class='line'>    <span class="vi">@client</span><span class="o">.</span><span class="n">account</span><span class="o">.</span><span class="n">sms</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">create</span><span class="p">(</span> <span class="c1"># method on client to create an sms message</span>
+</span><span class='line'>      <span class="ss">:from</span> <span class="o">=&gt;</span> <span class="s1">&#39;+15555555555&#39;</span><span class="p">,</span> <span class="c1"># my Twilio number in actual code</span>
+</span><span class='line'>      <span class="ss">:to</span> <span class="o">=&gt;</span> <span class="n">number</span><span class="p">,</span> <span class="c1"># user&#39;s number</span>
+</span><span class='line'>      <span class="ss">:body</span> <span class="o">=&gt;</span> <span class="s1">&#39;Download Flock and do more together: flockwithme.com/app&#39;</span> <span class="c1"># text message content</span>
+</span><span class='line'>    <span class="p">)</span>
+</span><span class='line'>    <span class="n">redirect_to</span> <span class="n">root_path</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Making it Look Pretty Part 1: Adding a fancyBox</h4>
+
+<p>I wanted to use javascript on the &ldquo;SEND ME A LINK&rdquo; button so that the website didn&rsquo;t have to load a new page to display the number form.  Not wanting to re-invent the wheel, I looked around for js plugins and ended up choosing fancyBox, a library to easily implement &ldquo;lightbox&rdquo; popups.</p>
+
+<p>To implement this plugin, there were a couple main steps:</p>
+
+<ol style="margin-left: 30px;">
+  <li>Create a hidden div containing the number form</li>
+  <li>Link a button to the hidden div</li>
+  <li>Add the necessary js from fancyBox</li>
+</ol>
+
+
+<p></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'># STEP 1: Add hidden div containing form
+</span><span class='line'># Note: id = &quot;number_form&quot;
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;div</span> <span class="na">style=</span><span class="s">&quot;display:none&quot;</span> <span class="na">class=</span><span class="s">&quot;text&quot;</span> <span class="na">id=</span><span class="s">&quot;number_form&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="err">&lt;</span>%= form_tag(send_text_path, :method =&gt; :post) do %&gt;
+</span><span class='line'>      <span class="err">&lt;</span>%= text_field_tag(:number, nil, :placeholder =&gt; &#39;555-555-5555&#39;)%&gt;<span class="nt">&lt;br&gt;</span>
+</span><span class='line'>      <span class="err">&lt;</span>%= submit_tag(&quot;Submit&quot;) %&gt;
+</span><span class='line'>    <span class="err">&lt;</span>% end %&gt;
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'># STEP 2: Creata a button that links to the hidden div
+</span><span class='line'># Note: class = &quot;fancybox&quot; and href = &quot;#number_form&quot; (id of div from STEP 1)
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;#number_form&quot;</span> <span class="na">class=</span><span class="s">&quot;fancybox&quot;</span><span class="nt">&gt;&lt;div&gt;</span>SEND ME A LINK<span class="nt">&lt;/div&gt;&lt;/a&gt;</span>
+</span><span class='line'>
+</span><span class='line'># STEP 3: Add the fancyBox js to show the div when the button is clicked
+</span><span class='line'># Note: I am calling the function &quot;fancybox&quot; on all links
+</span><span class='line'>#       that have a class named &quot;fancybox&quot; (from STEP 2)
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;a.fancybox&quot;</span><span class="p">).</span><span class="nx">fancybox</span><span class="p">({</span>
+</span><span class='line'>        <span class="nx">maxWidth</span><span class="o">:</span> <span class="mi">900</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">helpers</span> <span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">overlay</span> <span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nx">css</span> <span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="s1">&#39;background&#39;</span> <span class="o">:</span> <span class="s1">&#39;rgba(0, 0, 0, 0.8)&#39;</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>            <span class="p">},</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>      <span class="p">});</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;/script&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Making it Look Pretty Part 2: A Fancy Button</h4>
+
+<p><img src="/images/fancy-button.png" title="Fancy Button" ></p>
+
+<p>Once I got the fancyBox working, I wanted to customize the styling of the form. Earlier in the week I stumbled across an awesome <a href="http://tympanus.net/Development/CreativeButtons/">link</a> from Codrops that had examples of many different buttons using CSS.  I chose my favorite and added the appropriate CSS.</p>
+
+<p>The button I chose gives a 3D effect by creating a shadow and making the shadow smaller / shifting down the button while hovering over the button, and removing the shadow all together when clicked.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="c1">// Note I am using SASS, which allows me to nest my css</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">input</span><span class="o">[</span><span class="nt">type</span><span class="o">=</span><span class="nt">submit</span><span class="o">]</span> <span class="p">{</span>
+</span><span class='line'>    <span class="na">border</span><span class="o">:</span> <span class="no">none</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">cursor</span><span class="o">:</span> <span class="no">pointer</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">width</span><span class="o">:</span> <span class="mi">100</span><span class="kt">%</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">padding</span><span class="o">:</span> <span class="mi">15</span><span class="kt">px</span> <span class="mi">0</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">margin</span><span class="o">:</span> <span class="mi">15</span><span class="kt">px</span> <span class="mi">0</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">text-transform</span><span class="o">:</span> <span class="no">uppercase</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">position</span><span class="o">:</span> <span class="no">relative</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">background</span><span class="o">:</span> <span class="nv">$green</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">box-shadow</span><span class="o">:</span> <span class="mi">0</span> <span class="mi">6</span><span class="kt">px</span> <span class="mh">#527a52</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">font-family</span><span class="o">:</span> <span class="s2">&quot;proxima-nova&quot;</span><span class="o">,</span> <span class="s2">&quot;sans-serif&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">font-style</span><span class="o">:</span> <span class="no">italic</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">font-weight</span><span class="o">:</span> <span class="mi">800</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">font-size</span><span class="o">:</span> <span class="mi">1</span><span class="mf">.2</span><span class="kt">em</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">color</span><span class="o">:</span> <span class="nb">white</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">border-radius</span><span class="o">:</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">5</span><span class="kt">px</span> <span class="mi">5</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">&amp;</span><span class="nd">:hover</span><span class="p">{</span>
+</span><span class='line'>    <span class="na">box-shadow</span><span class="o">:</span> <span class="mi">0</span> <span class="mi">4</span><span class="kt">px</span> <span class="mh">#527a52</span><span class="p">;</span>
+</span><span class='line'>    <span class="na">top</span><span class="o">:</span> <span class="mi">2</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">&amp;</span><span class="nd">:active</span><span class="p">{</span>
+</span><span class='line'>      <span class="na">box-shadow</span><span class="o">:</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mh">#527a52</span><span class="p">;</span>
+</span><span class='line'>      <span class="na">top</span><span class="o">:</span> <span class="mi">6</span><span class="kt">px</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Making it Look Pretty Part 3: Responsive Design</h4>
+
+<p>Once I got the button looking sharp on a desktop browser, I then wanted to make the page responsive for mobile users.  Not only did I want to change the styling so it looked good on a phone, but I also wanted to change the main button so that when a user opens the site on their iPhone the &ldquo;SEND ME A LINK&rdquo; button turns into a &ldquo;DOWNLOAD THE APP&rdquo; button that takes him or her directly to the App Store.</p>
+
+<p>I made the button (and rest of the website) responsive using Bourbon and Neat. Bourbon is a mixin library for SASS, and Neat is a grid framework for SASS with Bourbon.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='scss'><span class='line'><span class="c1">// STEP 1: Define a mobile breakpoint (Neat version of CSS media query)</span>
+</span><span class='line'><span class="nv">$break_four</span><span class="o">:</span> <span class="nf">new-breakpoint</span><span class="p">(</span><span class="no">max-width</span> <span class="mi">585</span><span class="kt">px</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// STEP 2: Define style to hide elements where class = &quot;mobile&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nc">.mobile</span> <span class="p">{</span>
+</span><span class='line'> <span class="na">display</span><span class="o">:</span> <span class="no">none</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// STEP 3: Hide items where class = &quot;desktop&quot; and show </span>
+</span><span class='line'><span class="c1">//         items where class = &quot;mobile&quot; at breakpoint</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">@include</span><span class="nd"> media</span><span class="p">(</span><span class="nv">$break_four</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nc">.desktop</span> <span class="p">{</span>
+</span><span class='line'>    <span class="na">display</span><span class="o">:</span> <span class="no">none</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="nc">.mobile</span> <span class="p">{</span>
+</span><span class='line'>    <span class="na">display</span><span class="o">:</span> <span class="no">block</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// STEP 4: Add classes where appropriate</span>
+</span><span class='line'>
+</span><span class='line'><span class="na">&lt;div</span><span class="err"> </span><span class="na">id</span><span class="err">=&quot;</span><span class="na">button</span><span class="err">&quot;</span><span class="na">&gt;</span><span class="err">  </span>
+</span><span class='line'>    <span class="na">&lt;a</span><span class="err"> </span><span class="na">href</span><span class="err">=&quot;</span><span class="na">#number_form</span><span class="err">&quot; </span><span class="na">class</span><span class="err">=&quot;</span><span class="na">desktop</span><span class="err"> </span><span class="na">fancybox</span><span class="err">&quot;</span><span class="na">&gt;&lt;div&gt;SEND</span><span class="err"> </span><span class="na">ME</span><span class="err"> </span><span class="na">A</span><span class="err"> </span><span class="na">LINK&lt;/div&gt;&lt;/a&gt;</span>
+</span><span class='line'>    <span class="na">&lt;a</span><span class="err"> </span><span class="na">href</span><span class="err">=&quot;</span><span class="na">http</span><span class="o">:</span><span class="c1">//bit.ly/11LgLAn&quot; class=&quot;mobile&quot;&gt;&lt;div&gt;DOWNLOAD THE APP&lt;/div&gt;&lt;/a&gt;</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">div</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>And that&rsquo;s how to create a simple landing page for a mobile app!</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Adam Waxman</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-02T12:50:00-04:00" pubdate data-updated="true">Jul 2<span>nd</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/responsive/'>responsive</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>, <a class='category' href='/blog/categories/twilio/'>twilio,</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://awaxman11.github.io/blog/2013/07/02/building-a-mobile-app-landing-page/" data-via="ajwaxman" data-counturl="http://awaxman11.github.io/blog/2013/07/02/building-a-mobile-app-landing-page/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/06/17/twitter-api/" title="Previous Post: Using the Twitter API to Find People">&laquo; Using the Twitter API to Find People</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/07/21/checking-out-js/" title="Next Post: How jQuery and AJAX Actually Work">How jQuery and AJAX Actually Work &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <a style="width: 100%;" href="http://referrals.trhou.se/adamwaxman" target="_blank"><img src="http://wac.a8b5.edgecastcdn.net/80A8B5/static-assets/assets/content/referral-badge-green.png"/></a>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/07/13/how-to-create-an-angular-app-using-yeoman-and-deploy-it-to-heroku/">How to Create  an Angular App Using Yeoman and Deploy it to Heroku</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/25/getting-into-css3-animations/">Getting Into CSS3 Animations</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/10/11/sorting-a-rails-resource-based-on-a-calculated-value/">Sorting a Rails Resource Based on a Calculated Value</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/10/01/deploying-a-rails-app-with-capistrano-part-2/">Deploying a Rails App With Capistrano (Part 2)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/09/deploying-a-rails-app-with-capistrano/">Deploying a Rails App With Capistrano (Part 1)</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+<section>
+  <h1>About Me</h1>
+  <div id="twitter-profile" style="margin-top:0.5em;">
+    <p>
+      <strong>Adam Waxman</strong> 
+      (<a href="http://twitter.com/ajwaxman">@ajwaxman</a>)
+    </p>
+    <p>Product at <a href="https://seatgeek.com">SeatGeek</a>. <a href="http://flatironschool.com">Flatiron School</a> grad. I like to build stuff - <a href="https://twitter.com/flockwme">Flock</a> | <a href="https://twitter.com/rulethejungle">Rule the Jungle</a> | <a href="https://twitter.com/found_io">Found</a></p>
+  </div>
+  <script type="text/javascript">
+    $.domReady(function(){
+        var container = $('#twitter-profile'),
+            user = "ajwaxman";
+        
+        function parseTwLinks(s) {
+          var twUrl = "http://www.twitter.com/"
+          s = s.replace(/ (@([\w]+))/g, function(match, p1, p2) {
+              return " <a href='"+twUrl+p2+"'>"+p1+"</a>"
+          }).replace(/ (#([\w]+))/g, function(match, p1, p2) {
+              return " <a href='"+twUrl+"#!/search?q=%23"+p2+"'>"+p1+"</a>"
+          })
+          return s
+        }
+
+        $.ajax({
+            url: "http://api.twitter.com/1/users/show.json?include_entities=false&screen_name="+user+"&callback=?"
+          , type: 'jsonp'
+          , error: function (err) { $('#twitter-profile').addClass('error');  }
+          , success: function(data) {
+              container.html('<img class="left" src="http://api.twitter.com/1/users/profile_image/'+user+'.json?size=bigger" alt="@'+user+'"><p><strong>'+data.name+'</strong> (<a href="http://twitter.com/'+user+'">@'+user+'</a>)<br/>'+data.location+'</p><p>'+parseTwLinks(data.description)+'</p>');
+            }
+        })
+      });
+  </script>
+</section>
+<section>
+  <h1>Connect on Twitter!</h1>
+  <a class="twitter-timeline" href="https://twitter.com/ajwaxman" data-widget-id="370245364177047552">Tweets by @ajwaxman</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Adam Waxman -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+  - <span class="credit">Theme by <a href="http://www.gehaxelt.in">Gehaxelt</a></span>
+  <span class="credit">and <a href="http://www.it-solutions-neef.de">IT Solutions Neef</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'awaxman-coding';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://awaxman11.github.io/blog/2013/07/02/building-a-mobile-app-landing-page/';
+        var disqus_url = 'http://awaxman11.github.io/blog/2013/07/02/building-a-mobile-app-landing-page/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

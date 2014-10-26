@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: animation | Build, Break, Learn.]]></title>
+  <link href="http://awaxman11.github.io/blog/categories/animation/atom.xml" rel="self"/>
+  <link href="http://awaxman11.github.io/"/>
+  <updated>2014-10-26T10:53:52-04:00</updated>
+  <id>http://awaxman11.github.io/</id>
+  <author>
+    <name><![CDATA[Adam Waxman]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Getting Into CSS3 Animations]]></title>
+    <link href="http://awaxman11.github.io/blog/2014/01/25/getting-into-css3-animations/"/>
+    <updated>2014-01-25T15:56:00-05:00</updated>
+    <id>http://awaxman11.github.io/blog/2014/01/25/getting-into-css3-animations</id>
+    <content type="html"><![CDATA[<p>I recently had the opprtunity to dive into some CSS3 animations. I&rsquo;ve used libraries like <a href="animate.css">animate.css</a> and done animations with javascript, but never did any custom CSS3 work</p>
+
+<h4>The Task</h4>
+
+<p>We recently updated our &lsquo;tracking&rsquo; iconography at SeatGeek to match our new iPhone app. The lead designer created the heart icon with different states in a PSD and also created the animation below:</p>
+
+<p><img src="https://f.cloud.github.com/assets/4431362/1728894/c3f1a952-62b6-11e3-819f-ed196c859568.gif" alt="" /></p>
+
+<h4>What is CSS3 Animation?</h4>
+
+<p>In CSS, animation is an effect that lets an element gradually change styles. You create the animations with the @keyframes keyword, which is followed by the name of the animation.</p>
+
+<p><code>css
+@keyframes heartAnimation {
+  /* Animation code goes here */  
+}
+</code></p>
+
+<p>To make the animation cross browser compatible you need to use vendor prefixes:</p>
+
+<p>```css
+@keyframes heartAnimation {
+  /<em> IE 10+ </em>/
+}</p>
+
+<p>@-webkit-keyframes heartAnimation {
+  /<em> Safari 4+ </em>/
+}</p>
+
+<p>@-moz-keyframes heartAnimation {
+  /<em> Fx 5+ </em>/
+}</p>
+
+<p>@-o-keyframes heartAnimation {
+  /<em> Opera 12+ </em>/
+}
+```
+However, for the rest of this post I will exclude the vendor prefixes for the sake of space.</p>
+
+<p>The next step is to add the animation effects and decide when they happen. You can do this with either percentages from 0% to 100% or with the &lsquo;from&rsquo; and &lsquo;to&rsquo; keyword for simple animations with just a starting and ending state. Below is an example for changing the background color from yellow to blue, and then yellow to green to blue.</p>
+
+<p>```css
+@keyframes colorChange {
+  from {background: yellow;}
+  to   {background: blue;}
+}</p>
+
+<p>@keyframes colorChange {
+  0%   {background: yellow;}
+  50%  {background: green;}
+  100% {background: blue;}
+}</p>
+
+<p>```</p>
+
+<p>Once the keyframes are created, you can call the animations as CSS properties. For example the code below would run the colorChange animation above 2 times for a 2s duration:</p>
+
+<p>```css
+.color-animation {
+  animation-name: changeColor;
+  animation-iteration-count: 2;
+  animation-duration: 2s;
+}</p>
+
+<p>/<em> Shorthand </em>/
+.color-animation {
+  animation: changeColor 2 2s;
+}</p>
+
+<p>```
+You can check out all the CSS3 animation properties <a href="http://www.w3schools.com/cssref/css3_pr_animation.asp">here</a></p>
+
+<h4>Planning Out the Animation</h4>
+
+<p>After watching the gif several times, I realized it was a slight contraction followed by an expansion to a size slightly larger than the original size, and then back to the original size.</p>
+
+<h4>Heart Clicked Animation</h4>
+
+<p>Using the CSS3 keyframes and animation syntax above, here is the code I used to make the animation in the gif at the top of this page. It uses the css transform and property to scale the image.</p>
+
+<p>```css
+@keyframes heartAnimation {
+  0%  {transform: scale(1,1)}
+  20% {transform: scale(0.9,0.9)}
+  50% {transform: scale(1.15,1.15)}
+  80% {transform: scale(1,1)}
+}</p>
+
+<p>.toggle-animation {
+  animation: heartAnimation 0.7s; // no iteration count is needed as the default is 1 time
+}
+```
+For the image, I was using a sprite, so I also needed to change the position of the image to get the red background:</p>
+
+<p><code>css
+.toggle-animation {
+  background: url('../images/animation-example-sprite.png') no-repeat -320px 0;
+  animation: heartAnimation 0.7s; // no iteration count is needed as the default is 1 times
+}
+</code></p>
+
+<h4>Loading Animation</h4>
+
+<p>For a loading state, I made the heart white and pulsate in-and-out infinitely. It also scales down and back to the original size, instead of getting slightly larger than the original size before going to the original state like in the heartAnimation code above. Below is the code for the loading state:</p>
+
+<p>```css
+@keyframes loading {
+  0% {transform: scale(1,1) }
+  50% {transform: scale(0.8,0.8) }
+  100% {transform: scale(1,1) }
+}</p>
+
+<p>/<em> Notice the added &lsquo;infinite&rsquo; to is used to make the animation-iteration-count </em>/</p>
+
+<p>.toggle-loading {
+  background: url(&lsquo;../images/animation-example-sprite.png&rsquo;) no-repeat -160px 0; // make background white
+  animation: loading 1s infinite;
+  -webkit-animation: loading 1s infinite;
+  -moz-animation: loading 1s infinite;
+  -o-animation: loading 1s infinite;
+}
+```</p>
+
+<h4>Check Out Demos of the Animations</h4>
+
+<p>Here is a site I built to demo the animations:</p>
+
+<p><a href="http://heart-animation.herokuapp.com/">http://heart-animation.herokuapp.com/</a></p>
+
+<p>Below is the JS I used to make the animations happen when each icon is clicked. The JS adds and removes the classes that I added the animation properties to.</p>
+
+<p>```js
+$(document).ready(function(){</p>
+
+<p>  $(&lsquo;.animation-1 .image&rsquo;).on(&lsquo;click&rsquo;, function(){</p>
+
+<pre><code>$(this).toggleClass('toggle-animation');
+</code></pre>
+
+<p>  });</p>
+
+<p>  $(&lsquo;.animation-2 .image&rsquo;).on(&lsquo;click&rsquo;, function(){</p>
+
+<pre><code>$(this).toggleClass('toggle-animation-slow');
+</code></pre>
+
+<p>  });</p>
+
+<p>  $(&lsquo;.animation-3 .image&rsquo;).on(&lsquo;click&rsquo;, function(){</p>
+
+<pre><code>$(this).toggleClass('toggle-loading');
+</code></pre>
+
+<p>  });</p>
+
+<p>});
+```</p>
+]]></content>
+  </entry>
+  
+</feed>

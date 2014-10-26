@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: javascript | Build, Break, Learn.]]></title>
+  <link href="http://awaxman11.github.io/blog/categories/javascript/atom.xml" rel="self"/>
+  <link href="http://awaxman11.github.io/"/>
+  <updated>2014-10-26T10:53:52-04:00</updated>
+  <id>http://awaxman11.github.io/</id>
+  <author>
+    <name><![CDATA[Adam Waxman]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[How to deploy an app in 5 minutes using roots]]></title>
+    <link href="http://awaxman11.github.io/blog/2013/08/20/how-to-deploy-an-app-in-5-minutes-using-roots/"/>
+    <updated>2013-08-20T00:03:00-04:00</updated>
+    <id>http://awaxman11.github.io/blog/2013/08/20/how-to-deploy-an-app-in-5-minutes-using-roots</id>
+    <content type="html"><![CDATA[<h3>The Ingredients</h3>
+
+<ul style="margin-left: 30px;">
+  <li><strong><a href="http://nodejs.org/">node.js</a></strong>: server-side JavaScript</li>
+  <li><strong><a href="https://heroku.com">heroku</a></strong>: cloud platform as a service to help you easily deploy your apps</li>
+  <li><strong><a href="http://roots.cx">roots</a></strong> (the special sauce): a tool for quickly building beautiful and efficient web products</li>
+</ul>
+
+
+<h3>The Steps</h3>
+
+<h4>1. Install node</h4>
+
+<p>If you don&rsquo;t have node.js, install it from <a href="http://nodejs.org/">nodejs.org</a>.</p>
+
+<h4>2. Install roots</h4>
+
+<p>Once node.js is installed, you can can install roots in the terminal with the following command:</p>
+
+<p><code>bash
+npm install roots -g # prefix with sudo if you get a permission error
+</code></p>
+
+<h4>3. Create a new roots project</h4>
+
+<p>You can create a new roots project with the following command in the terminal:</p>
+
+<p><code>bash
+roots new [name of project] # i.e. roots new new_project
+</code></p>
+
+<h4>4. Start the local server</h4>
+
+<p>Once you&rsquo;ve switched into the new project folder, you can start the app on localhost:1111 with the following command:</p>
+
+<p><code>bash
+roots watch
+</code></p>
+
+<h4>5. Deploy to heroku</h4>
+
+<p>Now you&rsquo;re one small command away from having your app up on Heroku for the world to see:
+<code>bash
+roots deploy
+</code></p>
+
+<p>Yes, it&rsquo;s that easy.  If you don&rsquo;t believe me checkout the <a href="http://ancient-escarpment-6672.herokuapp.com/">app</a> I made while going through the roots tutorial.</p>
+
+<p>Checkout your own app with the following command:
+<code>bash
+heroku open
+</code></p>
+
+<p>Note: The standard homepage markup is placed in a views folder with the name &lsquo;index.jade&rsquo;.  If you don&rsquo;t want to use the default roots stack (jade, stylus, and coffeescript), you can revert to an html, css, and javascript stack by adding the &mdash;basic flag to your roots new command.</p>
+
+<h3>Awesome features</h3>
+
+<p>In addition to helping you get an app up and running in just a couple minutes, roots also has a ton of amazing built in features.</p>
+
+<p><strong><a href="http://livereload.com/">LiveReload</a></strong>: lets you see your markup and styling changes without having to refresh your browser
+<strong><a href="http://roots.cx/axis/">Axis | Better CSS</a></strong>: a css library built on top of stylus that helps take the pain out of traditional css</p>
+
+<h3>Axis in action</h3>
+
+<p>An example of how Axis makes css easier is how it simplifies border radius.  The following code shows how to create a border radius that works across different browsers: first using standard css, and then using Axis.</p>
+
+<p>```css
+/<em> Standard css border radius styling </em>/
+div {
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}</p>
+
+<p>/<em> Using axis to add a border radius </em>/
+div
+  border-radius: 5px; /<em> vendor prefixes are added automatically </em>/
+```</p>
+
+<p>The button in the example <a href="http://ancient-escarpment-6672.herokuapp.com/">page</a> uses the following code:</p>
+
+<p><code>css
+.button a
+  simple-button: blue 15
+  transition()
+</code>
+Border-radius? Included. An easy on the eyes blue? Included. Darken on hover? Included. Yep, it&rsquo;s super convenient. There are a lot of other cool features you can check out via the library&rsquo;s <a href="http://roots.cx/axis/">documentation</a>.</p>
+
+<h3>This is just the tip of the iceberg</h3>
+
+<p>There are a lot of other awesome features that I haven&rsquo;t talked about above &ndash; for example dynamic content and js templates.  The roots creator, <a href="https://twitter.com/jescalan">@jescalan</a>, has some great video tutorials that you can find <a href="http://roots.cx/#tutorials">here</a> if you are interested in learning more.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[How jQuery and AJAX Actually Work]]></title>
+    <link href="http://awaxman11.github.io/blog/2013/07/21/checking-out-js/"/>
+    <updated>2013-07-21T23:13:00-04:00</updated>
+    <id>http://awaxman11.github.io/blog/2013/07/21/checking-out-js</id>
+    <content type="html"><![CDATA[<p>As someone who loves UX and design, it is not surprising that I&rsquo;ve been wanting to learn about JavaScript &ndash; the language of the browser that allows for cool client side interactions. I&rsquo;ve used many JS libraries, but wanted to dive deeper into AJAX. Before today I didn&rsquo;t even know what it meant, just that it was something I wanted to know more about.</p>
+
+<h3>So What is AJAX?</h3>
+
+<p>AJAX, or Asynchronous Javascript And XML, is a client side technique for communication with a web server.  In other words, it allows you to fetch data &lsquo;in the background&rsquo; without having to reload a whole page.</p>
+
+<p>In a typical web request, you send a URL request to the server and the server responds with the corresponding HTML, CSS, and JavaScript that generates a full new page in your browser.</p>
+
+<p>In contrast, in a typical AJAX request, the HTML, CSS, and JavaScript is already loaded. Instead of making a URL request for another whole page, you use JavaScript to talk to the server and receive smaller pieces of information that can range from HTML to other data formats like JSON and XML. The JavaScript then acts on the response and updates the page accordingly, without having to refresh the entire page.</p>
+
+<h3>What does an AJAX request look like?</h3>
+
+<p>``` javascript</p>
+
+<p>$.ajax(url, settings)</p>
+
+<p>```</p>
+
+<p> At a high level an AJAX request consists of the URL you a making a request to, and then corresponding settings to handle the response.  Below are a few of the more popular callbacks that make up the settings:</p>
+
+<ul style="margin-left: 30px;">
+  <li><strong>success</strong>: what to do if the URL request is successful</li>
+  <li><strong>error</strong>: what to do if the URL request is unsuccessful</li>
+  <li><strong>timeout</strong>: how long to allow the URL request to run before an error message pops up</li>
+  <li><strong>beforeSend</strong>: runs before the AJAX request, good place to put a spinner</li>
+    <li><strong>complete</strong>: runs after both success and error, good place to stop a spinner</li>
+</ul>
+
+
+<h3>Examples</h3>
+
+<p>``` javascript
+/<em> Example 1 </em>/
+$.ajax(&lsquo;index.html&rsquo;, {
+  success: function(response) {</p>
+
+<pre><code>$('.hello-world').html(response);
+</code></pre>
+
+<p>  }
+});</p>
+
+<p>```
+Example 1: makes a request to &lsquo;index.html&rsquo; and then inserts the response into the item in the DOM that has a class called &ldquo;hello-world&rdquo;</p>
+
+<p>``` javascript
+/<em> Example 2 </em>/
+$.ajax(&lsquo;profile.html?userId=1&rsquo;, {
+  success: function(response) {</p>
+
+<pre><code>$('.show').html(response);
+</code></pre>
+
+<p>  }
+});</p>
+
+<p>/<em> Example 3 </em>/
+$.ajax(&lsquo;profile.html&rsquo;, {
+  success: function(response) {</p>
+
+<pre><code>$('.show').html(response);
+</code></pre>
+
+<p>  },
+  data: {&ldquo;userId&rdquo;: 1}</p>
+
+<pre><code>}
+</code></pre>
+
+<p>});</p>
+
+<p>/<em> Example 4 </em>/
+$.ajax(&lsquo;profile.html&rsquo;, {
+  success: function(response) {</p>
+
+<pre><code>$('.show').html(response);
+</code></pre>
+
+<p>  },
+  data: {&ldquo;userId&rdquo;: $(&ldquo;.show&rdquo;).data(&ldquo;userId&rdquo;)}</p>
+
+<pre><code>}
+</code></pre>
+
+<p>});</p>
+
+<p>/<em> Corresponding HTML to go with Example 4 </em>/</p>
+
+<div class="show" data-userId="1"></div>
+
+
+<p>```
+These three examples all make a request to the url &lsquo;profile.html?userId=1&rsquo; and show the various ways to send parameters with a request.  In example 2 the data is put manually into the URL.  In example 3 the data is put into a JavaScript object.  Lastly, in example 4 the AJAX request pulls data from HTML, which when combined with ERB tags can make the request very dynamic.</p>
+
+<p>``` javascript
+/<em> Example 5 </em>/
+$.ajax(&lsquo;index.html&rsquo;, {
+  success: function(response) {</p>
+
+<pre><code>$('.hello-world').html(response);
+</code></pre>
+
+<p>  },
+  timeout: 3000,
+  beforeSend: function() {</p>
+
+<pre><code>$('.hello-world').addClass('is-loading');
+},
+complete: function() {
+$('.hello-world').removeClass('.is-loading');
+}
+</code></pre>
+
+<p>});</p>
+
+<p>```</p>
+
+<p>Example 5 demonstrates some of the callback settings.  In this AJAX request, if the response is not successfully made it will stop the request after 3 seconds (3000 milliseconds).  It also demonstrates common code for adding a loading animation while the request is being made.</p>
+]]></content>
+  </entry>
+  
+</feed>

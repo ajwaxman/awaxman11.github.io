@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: capistrano | Build, Break, Learn.]]></title>
+  <link href="http://awaxman11.github.io/blog/categories/capistrano/atom.xml" rel="self"/>
+  <link href="http://awaxman11.github.io/"/>
+  <updated>2014-10-26T10:53:52-04:00</updated>
+  <id>http://awaxman11.github.io/</id>
+  <author>
+    <name><![CDATA[Adam Waxman]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Deploying a Rails App With Capistrano (Part 2)]]></title>
+    <link href="http://awaxman11.github.io/blog/2013/10/01/deploying-a-rails-app-with-capistrano-part-2/"/>
+    <updated>2013-10-01T10:00:00-04:00</updated>
+    <id>http://awaxman11.github.io/blog/2013/10/01/deploying-a-rails-app-with-capistrano-part-2</id>
+    <content type="html"><![CDATA[<p>My last <a href="http://awaxman11.github.io/blog/2013/09/09/deploying-a-rails-app-with-capistrano/">post</a> outlined using Capistrano to deploy my 6-week long Flatiron School <a href="http://demo.hire.flatironschool.com/">project</a>. The post included a brief introduction of Capistrano, including what it is and the steps to get a Capfile (where Capistrano reads instructions from) into your app.</p>
+
+<p>In this post, I am going to continue to walk through a basic deploy.rb file.  If you don&rsquo;t know what what a deploy.rb file is you should check out the earlier <a href="http://awaxman11.github.io/blog/2013/09/09/deploying-a-rails-app-with-capistrano/">post</a> first.</p>
+
+<p>```ruby
+require &lsquo;bundler/capistrano&rsquo; # for bundler support</p>
+
+<p>set :application, &ldquo;set your application name here&rdquo;
+set :repository,  &ldquo;set your repository location here&rdquo;</p>
+
+<p>set :user, &lsquo;USERNAME&rsquo;
+set :deploy_to, &ldquo;/home/#{ user }/#{ application }&rdquo;
+set :use_sudo, false</p>
+
+<p>set :scm, :git</p>
+
+<p>default_run_options[:pty] = true</p>
+
+<p>role :web, &ldquo;96.8.123.64&rdquo;  # Your HTTP server, Apache/etc
+role :app, &ldquo;96.8.123.64&rdquo;  # This may be the same as your <code>Web</code> server</p>
+
+<h1>if you want to clean up old releases on each deploy uncomment this:</h1>
+
+<h1>after &ldquo;deploy:restart&rdquo;, &ldquo;deploy:cleanup&rdquo;</h1>
+
+<h1>if you&rsquo;re still using the script/reaper helper you will need</h1>
+
+<h1>these <a href="http://github.com/rails/irs_process_scripts">http://github.com/rails/irs_process_scripts</a></h1>
+
+<h1>If you are using Passenger mod_rails uncomment this:</h1>
+
+<p>namespace :deploy do
+ task :start do ; end
+ task :stop do ; end
+ task :restart, :roles => :app, :except => { :no_release => true } do
+   run &ldquo;#{try_sudo} touch #{File.join(current_path,&lsquo;tmp&rsquo;,&lsquo;restart.txt&rsquo;)}&rdquo;
+ end
+end
+```</p>
+
+<p>In the previous post I left off with the set &lsquo;:scm, :git line&rsquo;, so I will start with the following line:</p>
+
+<p><code>ruby
+default_run_options[:pty] = true
+</code>
+This is included to make sure Capistrano interacts properly with the shell on our server. For example, when using github your server needs to be able to access your repo. This capistrano config settting is needed for the password prompt from git to work so you can access it.</p>
+
+<p><code>ruby
+role :web, "96.8.123.64" # Your HTTP server, Apache/etc
+role :app, "96.8.123.64" # This may be the same as your Web server
+</code></p>
+
+<p>The above two lines assign the web and app &lsquo;roles&rsquo; to specific servers. Capistrano roles allow you to have different servers handle different parts of the app (server for app, server for handling requests, and server for the database). We used one server for all aspects so assigned all roles to the same server.</p>
+
+<p>Since we used Passenger, we also uncommented the :deploy namespace as is instructed in the standard deploy.rb file. This part of the file is an example of Capistrano&rsquo;s task-oriented nature. Similar to rake tasks, we can create &lsquo;cap&rsquo; tasks with the task keyword.  For example, take the following 3 lines of code:</p>
+
+<p><code>ruby
+task :hello do
+  puts "Hello World"
+end
+</code></p>
+
+<p>We can run this code with the following command in the terminal:</p>
+
+<p><code>bash
+cap hello
+</code></p>
+
+<p>We also used a common capistrano task to symlink specific files that were purposely excluded from our git repo. For example, we had an application.yml file with our Crunchbase API key and gmail username/password. Since we open sourced the repo, we had to make sure that file was included in our .gitignore. Because capistrano is getting the code from github, we have to manually link these ignored files to the server in order for them to be included.  The following task helps us do just that.
+ruby
+<code>
+task :symlink_config, :roles =&gt; :app do
+  run "ln -nfs #{shared_path}/config/application.yml #{release_path}/config/application.yml"
+end
+</code>
+In order for the symlink to work though, the file must already be in the shared folder on the server. You can securely copy a file from your local machine using a variation of the following command:</p>
+
+<p><code>bash
+scp config/application.yml example@123.456.789.12:/home/example/example_app/shared
+</code></p>
+
+<p>And that concludes my Capistrano configuration process.   To deploy and update the app I simply run the following command:</p>
+
+<p><code>
+cap deploy
+</code></p>
+
+<p>If you&rsquo;re interested in learning more about deploying a rails app with Capistrano, there is a good <a href="http://railscasts.com/episodes/133-capistrano-tasks-revised">railscast</a> and also a nice <a href="https://github.com/capistrano/capistrano/wiki">wiki</a> on Github.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Deploying a Rails App With Capistrano (Part 1)]]></title>
+    <link href="http://awaxman11.github.io/blog/2013/09/09/deploying-a-rails-app-with-capistrano/"/>
+    <updated>2013-09-09T12:03:00-04:00</updated>
+    <id>http://awaxman11.github.io/blog/2013/09/09/deploying-a-rails-app-with-capistrano</id>
+    <content type="html"><![CDATA[<p>I recently graduated from the Flatiron School, where I worked on a 6-week long project with a group of 3 other students.  Our project, <a href="https://github.com/awaxman11/HireMe">HireMe</a>, is a CRM platform to help manage the interview process. We built the app using Rails and deployed it onto a cloud server using Capistrano (along with Nginx and Passenger). For side projects I&rsquo;ve used Heroku, so this was my first time deploying to my own server.</p>
+
+<h3>What is Capistrano?</h3>
+
+<p>Capistrano is a remote server automation and deployment tool written in ruby. Put simply, it helps you get your code on a server and easily run commands on a server so your application is ready for the world to use.</p>
+
+<h3>Using Capistrano</h3>
+
+<p>The first step in using capitstrano is installing the capistrano gem on your local machine. Capistrano only requires that your have access to your server via Secure Shell (SSH).</p>
+
+<p><code>bash
+gem install capistrano
+</code></p>
+
+<p>Once the gem is installed the next step is to cd into your repository&rsquo;s directory and run the following command:</p>
+
+<p><code>bash
+capify .
+</code></p>
+
+<p>This creates a Capfile, which is where Capistrano reads instructions from. This is what it looks like out of the package:</p>
+
+<p>```ruby
+load &lsquo;deploy&rsquo;</p>
+
+<h1>Uncomment if you are using Rails' asset pipeline</h1>
+
+<pre><code># load 'deploy/assets'
+</code></pre>
+
+<p>load &lsquo;config/deploy&rsquo; # remove this line to skip loading any of the default tasks
+```</p>
+
+<p>The capify command also creates a file in the config directory called deploy.rb, which  the Capfile loads from as you can see above. The deploy file contains information about the servers you want to connect to and the tasks you want to run on those servers.</p>
+
+<p>Below is the default deploy.rb file:</p>
+
+<p>```ruby
+set :application, &ldquo;set your application name here&rdquo;
+set :repository,  &ldquo;set your repository location here&rdquo;</p>
+
+<h1>set :scm, :git # You can set :scm explicitly or Capistrano will make an intelligent guess based on known version control directory names</h1>
+
+<h1>Or: <code>accurev</code>, <code>bzr</code>, <code>cvs</code>, <code>darcs</code>, <code>git</code>, <code>mercurial</code>, <code>perforce</code>, <code>subversion</code> or <code>none</code></h1>
+
+<p>role :web, &ldquo;your web-server here&rdquo;                          # Your HTTP server, Apache/etc
+role :app, &ldquo;your app-server here&rdquo;                          # This may be the same as your <code>Web</code> server
+role :db,  &ldquo;your primary db-server here&rdquo;, :primary => true # This is where Rails migrations will run
+role :db,  &ldquo;your slave db-server here&rdquo;</p>
+
+<h1>if you want to clean up old releases on each deploy uncomment this:</h1>
+
+<h1>after &ldquo;deploy:restart&rdquo;, &ldquo;deploy:cleanup&rdquo;</h1>
+
+<h1>if you&rsquo;re still using the script/reaper helper you will need</h1>
+
+<h1>these <a href="http://github.com/rails/irs_process_scripts">http://github.com/rails/irs_process_scripts</a></h1>
+
+<h1>If you are using Passenger mod_rails uncomment this:</h1>
+
+<h1>namespace :deploy do</h1>
+
+<h1>task :start do ; end</h1>
+
+<h1>task :stop do ; end</h1>
+
+<h1>task :restart, :roles => :app, :except => { :no_release => true } do</h1>
+
+<h1>run &ldquo;#{try_sudo} touch #{File.join(current_path,&lsquo;tmp&rsquo;,&lsquo;restart.txt&rsquo;)}&rdquo;</h1>
+
+<h1>end</h1>
+
+<h1>end</h1>
+
+<p>```</p>
+
+<p>We worked off of an awesome deployment guide by <a href="https://twitter.com/spike666">Spike Grobstein</a> that recommended starting with the following deploy.rb file:</p>
+
+<p>```ruby
+require &lsquo;bundler/capistrano&rsquo; # for bundler support</p>
+
+<p>set :application, &ldquo;set your application name here&rdquo;
+set :repository,  &ldquo;set your repository location here&rdquo;</p>
+
+<p>set :user, &lsquo;USERNAME&rsquo;
+set :deploy_to, &ldquo;/home/#{ user }/#{ application }&rdquo;
+set :use_sudo, false</p>
+
+<p>set :scm, :git</p>
+
+<p>default_run_options[:pty] = true</p>
+
+<p>role :web, &ldquo;96.8.123.64&rdquo;                          # Your HTTP server, Apache/etc
+role :app, &ldquo;96.8.123.64&rdquo;                          # This may be the same as your <code>Web</code> server</p>
+
+<h1>if you want to clean up old releases on each deploy uncomment this:</h1>
+
+<h1>after &ldquo;deploy:restart&rdquo;, &ldquo;deploy:cleanup&rdquo;</h1>
+
+<h1>if you&rsquo;re still using the script/reaper helper you will need</h1>
+
+<h1>these <a href="http://github.com/rails/irs_process_scripts">http://github.com/rails/irs_process_scripts</a></h1>
+
+<h1>If you are using Passenger mod_rails uncomment this:</h1>
+
+<p>namespace :deploy do
+ task :start do ; end
+ task :stop do ; end
+ task :restart, :roles => :app, :except => { :no_release => true } do
+   run &ldquo;#{try_sudo} touch #{File.join(current_path,&lsquo;tmp&rsquo;,&lsquo;restart.txt&rsquo;)}&rdquo;
+ end
+end
+```</p>
+
+<p>This version differs slightly from the default deploy.rb file, namely adding lines to set the user information, where to deploy to, and a couple other small settings. Below are some exaplanations of each of the lines in this file.</p>
+
+<p><code>ruby
+set :application, "studentbody"
+</code>
+This code sets the application variable.  It will become the name of the overarching folder on the server and is also used in the deploy_to location a couple lines below.</p>
+
+<p>```ruby
+set :repository,  &ldquo;set your repository location here&rdquo;</p>
+
+<h1>example</h1>
+
+<p>set :repository,  &ldquo;git@github.com:YourGithubUsername/ExampleRepo.git&rdquo;
+```
+The repository variable tells Capistrano where to find your code.  We used a github hosted repository.</p>
+
+<p><code>ruby
+set :user, 'USERNAME'
+</code>
+The above line sets the name of the user we are deploying as.  For example if you are SSHing into your server with the following command &lsquo;ssh <a href="&#x6d;&#x61;&#105;&#x6c;&#116;&#111;&#58;&#101;&#120;&#x61;&#x6d;&#x70;&#108;&#x65;&#64;&#49;&#57;&#x32;&#x2e;&#x32;&#52;&#x31;&#46;&#53;&#53;&#53;&#x2e;&#x35;&#53;">&#x65;&#120;&#x61;&#109;&#112;&#x6c;&#101;&#x40;&#x31;&#x39;&#x32;&#46;&#50;&#52;&#49;&#x2e;&#53;&#53;&#x35;&#x2e;&#x35;&#x35;</a>&rsquo; then you&rsquo;d set :user to example.</p>
+
+<p><code>ruby
+set :deploy_to, "/home/#{ user }/#{ application }"
+</code></p>
+
+<p>This command sets the location of deployment.  In the case where the the user is jsmith11 and the app name is example-app, the above code would deploy the app to &lsquo;/home/jsmith11/example-app&rsquo; directory on the remote server.</p>
+
+<p><code>ruby
+set :use_sudo, false
+</code>
+The user_sudo variable tells Capistrano whether or not to prefix sudo infront of all commands. Sudo is a prefix that allows you to run programs with the security priveledges of another user (commonly used with the superuser/root). In our case we were deploying to a location that our user owned, so we set this to false.</p>
+
+<p><code>ruby
+set :scm, :git
+</code></p>
+
+<p>The scm variable sets the source-code-management system, which in our case was git.</p>
+
+<p>In a follow up post I will talk more about the rest of the deploy.rb file, custom tasks we ran in our HireMe app, and getting the app up and running using the &lsquo;cap deploy&rsquo; command.</p>
+]]></content>
+  </entry>
+  
+</feed>

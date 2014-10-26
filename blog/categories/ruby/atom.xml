@@ -1,0 +1,723 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: ruby | Build, Break, Learn.]]></title>
+  <link href="http://awaxman11.github.io/blog/categories/ruby/atom.xml" rel="self"/>
+  <link href="http://awaxman11.github.io/"/>
+  <updated>2014-10-26T10:53:52-04:00</updated>
+  <id>http://awaxman11.github.io/</id>
+  <author>
+    <name><![CDATA[Adam Waxman]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Deploying a Rails App With Capistrano (Part 1)]]></title>
+    <link href="http://awaxman11.github.io/blog/2013/09/09/deploying-a-rails-app-with-capistrano/"/>
+    <updated>2013-09-09T12:03:00-04:00</updated>
+    <id>http://awaxman11.github.io/blog/2013/09/09/deploying-a-rails-app-with-capistrano</id>
+    <content type="html"><![CDATA[<p>I recently graduated from the Flatiron School, where I worked on a 6-week long project with a group of 3 other students.  Our project, <a href="https://github.com/awaxman11/HireMe">HireMe</a>, is a CRM platform to help manage the interview process. We built the app using Rails and deployed it onto a cloud server using Capistrano (along with Nginx and Passenger). For side projects I&rsquo;ve used Heroku, so this was my first time deploying to my own server.</p>
+
+<h3>What is Capistrano?</h3>
+
+<p>Capistrano is a remote server automation and deployment tool written in ruby. Put simply, it helps you get your code on a server and easily run commands on a server so your application is ready for the world to use.</p>
+
+<h3>Using Capistrano</h3>
+
+<p>The first step in using capitstrano is installing the capistrano gem on your local machine. Capistrano only requires that your have access to your server via Secure Shell (SSH).</p>
+
+<p><code>bash
+gem install capistrano
+</code></p>
+
+<p>Once the gem is installed the next step is to cd into your repository&rsquo;s directory and run the following command:</p>
+
+<p><code>bash
+capify .
+</code></p>
+
+<p>This creates a Capfile, which is where Capistrano reads instructions from. This is what it looks like out of the package:</p>
+
+<p>```ruby
+load &lsquo;deploy&rsquo;</p>
+
+<h1>Uncomment if you are using Rails' asset pipeline</h1>
+
+<pre><code># load 'deploy/assets'
+</code></pre>
+
+<p>load &lsquo;config/deploy&rsquo; # remove this line to skip loading any of the default tasks
+```</p>
+
+<p>The capify command also creates a file in the config directory called deploy.rb, which  the Capfile loads from as you can see above. The deploy file contains information about the servers you want to connect to and the tasks you want to run on those servers.</p>
+
+<p>Below is the default deploy.rb file:</p>
+
+<p>```ruby
+set :application, &ldquo;set your application name here&rdquo;
+set :repository,  &ldquo;set your repository location here&rdquo;</p>
+
+<h1>set :scm, :git # You can set :scm explicitly or Capistrano will make an intelligent guess based on known version control directory names</h1>
+
+<h1>Or: <code>accurev</code>, <code>bzr</code>, <code>cvs</code>, <code>darcs</code>, <code>git</code>, <code>mercurial</code>, <code>perforce</code>, <code>subversion</code> or <code>none</code></h1>
+
+<p>role :web, &ldquo;your web-server here&rdquo;                          # Your HTTP server, Apache/etc
+role :app, &ldquo;your app-server here&rdquo;                          # This may be the same as your <code>Web</code> server
+role :db,  &ldquo;your primary db-server here&rdquo;, :primary => true # This is where Rails migrations will run
+role :db,  &ldquo;your slave db-server here&rdquo;</p>
+
+<h1>if you want to clean up old releases on each deploy uncomment this:</h1>
+
+<h1>after &ldquo;deploy:restart&rdquo;, &ldquo;deploy:cleanup&rdquo;</h1>
+
+<h1>if you&rsquo;re still using the script/reaper helper you will need</h1>
+
+<h1>these <a href="http://github.com/rails/irs_process_scripts">http://github.com/rails/irs_process_scripts</a></h1>
+
+<h1>If you are using Passenger mod_rails uncomment this:</h1>
+
+<h1>namespace :deploy do</h1>
+
+<h1>task :start do ; end</h1>
+
+<h1>task :stop do ; end</h1>
+
+<h1>task :restart, :roles => :app, :except => { :no_release => true } do</h1>
+
+<h1>run &ldquo;#{try_sudo} touch #{File.join(current_path,&lsquo;tmp&rsquo;,&lsquo;restart.txt&rsquo;)}&rdquo;</h1>
+
+<h1>end</h1>
+
+<h1>end</h1>
+
+<p>```</p>
+
+<p>We worked off of an awesome deployment guide by <a href="https://twitter.com/spike666">Spike Grobstein</a> that recommended starting with the following deploy.rb file:</p>
+
+<p>```ruby
+require &lsquo;bundler/capistrano&rsquo; # for bundler support</p>
+
+<p>set :application, &ldquo;set your application name here&rdquo;
+set :repository,  &ldquo;set your repository location here&rdquo;</p>
+
+<p>set :user, &lsquo;USERNAME&rsquo;
+set :deploy_to, &ldquo;/home/#{ user }/#{ application }&rdquo;
+set :use_sudo, false</p>
+
+<p>set :scm, :git</p>
+
+<p>default_run_options[:pty] = true</p>
+
+<p>role :web, &ldquo;96.8.123.64&rdquo;                          # Your HTTP server, Apache/etc
+role :app, &ldquo;96.8.123.64&rdquo;                          # This may be the same as your <code>Web</code> server</p>
+
+<h1>if you want to clean up old releases on each deploy uncomment this:</h1>
+
+<h1>after &ldquo;deploy:restart&rdquo;, &ldquo;deploy:cleanup&rdquo;</h1>
+
+<h1>if you&rsquo;re still using the script/reaper helper you will need</h1>
+
+<h1>these <a href="http://github.com/rails/irs_process_scripts">http://github.com/rails/irs_process_scripts</a></h1>
+
+<h1>If you are using Passenger mod_rails uncomment this:</h1>
+
+<p>namespace :deploy do
+ task :start do ; end
+ task :stop do ; end
+ task :restart, :roles => :app, :except => { :no_release => true } do
+   run &ldquo;#{try_sudo} touch #{File.join(current_path,&lsquo;tmp&rsquo;,&lsquo;restart.txt&rsquo;)}&rdquo;
+ end
+end
+```</p>
+
+<p>This version differs slightly from the default deploy.rb file, namely adding lines to set the user information, where to deploy to, and a couple other small settings. Below are some exaplanations of each of the lines in this file.</p>
+
+<p><code>ruby
+set :application, "studentbody"
+</code>
+This code sets the application variable.  It will become the name of the overarching folder on the server and is also used in the deploy_to location a couple lines below.</p>
+
+<p>```ruby
+set :repository,  &ldquo;set your repository location here&rdquo;</p>
+
+<h1>example</h1>
+
+<p>set :repository,  &ldquo;git@github.com:YourGithubUsername/ExampleRepo.git&rdquo;
+```
+The repository variable tells Capistrano where to find your code.  We used a github hosted repository.</p>
+
+<p><code>ruby
+set :user, 'USERNAME'
+</code>
+The above line sets the name of the user we are deploying as.  For example if you are SSHing into your server with the following command &lsquo;ssh <a href="&#x6d;&#97;&#x69;&#108;&#116;&#x6f;&#58;&#x65;&#x78;&#97;&#x6d;&#x70;&#108;&#x65;&#x40;&#49;&#57;&#50;&#46;&#x32;&#x34;&#x31;&#46;&#53;&#x35;&#53;&#46;&#53;&#x35;">&#x65;&#120;&#x61;&#x6d;&#112;&#x6c;&#x65;&#x40;&#x31;&#x39;&#x32;&#x2e;&#50;&#52;&#x31;&#x2e;&#53;&#x35;&#x35;&#46;&#53;&#53;</a>&rsquo; then you&rsquo;d set :user to example.</p>
+
+<p><code>ruby
+set :deploy_to, "/home/#{ user }/#{ application }"
+</code></p>
+
+<p>This command sets the location of deployment.  In the case where the the user is jsmith11 and the app name is example-app, the above code would deploy the app to &lsquo;/home/jsmith11/example-app&rsquo; directory on the remote server.</p>
+
+<p><code>ruby
+set :use_sudo, false
+</code>
+The user_sudo variable tells Capistrano whether or not to prefix sudo infront of all commands. Sudo is a prefix that allows you to run programs with the security priveledges of another user (commonly used with the superuser/root). In our case we were deploying to a location that our user owned, so we set this to false.</p>
+
+<p><code>ruby
+set :scm, :git
+</code></p>
+
+<p>The scm variable sets the source-code-management system, which in our case was git.</p>
+
+<p>In a follow up post I will talk more about the rest of the deploy.rb file, custom tasks we ran in our HireMe app, and getting the app up and running using the &lsquo;cap deploy&rsquo; command.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[What is the difference between a block, a proc, and a lambda in ruby?]]></title>
+    <link href="http://awaxman11.github.io/blog/2013/08/05/what-is-the-difference-between-a-block/"/>
+    <updated>2013-08-05T23:52:00-04:00</updated>
+    <id>http://awaxman11.github.io/blog/2013/08/05/what-is-the-difference-between-a-block</id>
+    <content type="html"><![CDATA[<h3>What are blocks, procs, and lambdas?</h3>
+
+<p><strong>Coder Talk</strong>: Examples of <em>closures</em> in ruby.</p>
+
+<p><strong>Plain old english</strong>: Ways of grouping code we want to run.</p>
+
+<p>```ruby</p>
+
+<h1>Block Examples</h1>
+
+<p>[1,2,3].each { |x| puts x*2 }   # block is in between the curly braces</p>
+
+<p>[1,2,3].each do |x|
+  puts x*2                    # block is everything between the do and end
+end</p>
+
+<h1>Proc Examples</h1>
+
+<p>p = Proc.new { |x| puts x*2 } <br/>
+[1,2,3].each(&amp;p)              # The &lsquo;&amp;&rsquo; tells ruby to turn the proc into a block</p>
+
+<p>proc = Proc.new { puts &ldquo;Hello World&rdquo; }
+proc.call                     # The body of the Proc object gets executed when called</p>
+
+<h1>Lambda Examples</h1>
+
+<p>lam = lambda { |x| puts x*2 } <br/>
+[1,2,3].each(&amp;lam)</p>
+
+<p>lam = lambda { puts &ldquo;Hello World&rdquo; }
+lam.call
+```</p>
+
+<p>While it looks like these are all very similar, there are subtle differences that I will cover below.</p>
+
+<h3>Differences between Blocks and Procs</h3>
+
+<ol style="margin-left: 23px;">
+  <p></p>
+  <li><strong>Procs are objects, blocks are not</strong></li>
+  <p></p>
+
+
+<p></p>A proc (notice the lowercase p) is an instance of the Proc class.
+
+```ruby
+p = Proc.new { puts "Hello World" }
+```
+This lets us call methods on it and assign it to variables. Procs can also return themselves.
+```ruby
+p.call  # prints 'Hello World'
+p.class # returns 'Proc'
+a = p   # a now equals p, a Proc instance
+p       # returns a proc object '#<Proc:0x007f96b1a60eb0@(irb):46>'
+
+```
+<p></p>
+In contrast, a block is just part of the *syntax* of a method call. It doesn't mean anything on a standalone basis and can only appear in argument lists.
+```
+{ puts "Hello World"}       # syntax error  
+a = { puts "Hello World"}   # syntax error
+[1,2,3].each {|x| puts x*2} # only works as part of the syntax of a method call
+```
+  <li><strong>At most one block can appear in an argument list</strong></li>
+
+<p></p>In contrast, you can pass multiple procs to methods.  
+```  ruby
+def multiple_procs(proc1, proc2)
+  proc1.call
+  proc2.call
+end
+
+a = Proc.new { puts "First proc" }
+b = Proc.new { puts "Second proc" }
+
+multiple_procs(a,b) 
+```
+</ol>
+
+
+<h3>Differences between Procs and Lambdas</h3>
+
+<p>Before I get into the differences between procs and lambdas, it is important to mention that they are both Proc objects.
+```ruby
+proc = Proc.new { puts &ldquo;Hello world&rdquo; }
+lam = lambda { puts &ldquo;Hello World&rdquo; }</p>
+
+<p>proc.class # returns &lsquo;Proc&rsquo;
+lam.class  # returns &lsquo;Proc&rsquo;
+<code>
+However, lambdas are a different 'flavor' of procs.  This slight difference is shown when returning the objects.
+</code>ruby
+proc   # returns &lsquo;#&lt;Proc:0x007f96b1032d30@(irb):75>&rsquo;
+lam    # returns &lsquo;&lt;Proc:0x007f96b1b41938@(irb):76 (lambda)>&rsquo;
+```
+The (lambda) notation is a reminder that while procs and lambdas are very similar, even both instances of the Proc class, they are also slightly different.  Below are the key differences.</p>
+
+<ol style="margin-left: 23px;">
+  <li><strong>Lambdas check the number of arguments, while procs do not</strong></li>
+  <p></p>
+
+```ruby
+lam = lambda { |x| puts x }    # creates a lambda that takes 1 argument
+lam.call(2)                    # prints out 2
+lam.call                       # ArgumentError: wrong number of arguments (0 for 1)
+lam.call(1,2,3)                # ArgumentError: wrong number of arguments (3 for 1)
+```
+
+In contrast, procs don't care if they are passed the wrong number of arguments.  
+
+```ruby
+proc = Proc.new { |x| puts x } # creates a proc that takes 1 argument
+proc.call(2)                   # prints out 2
+proc.call                      # returns nil
+proc.call(1,2,3)               # prints out 1 and forgets about the extra arguments
+```
+As shown above, procs don't freak out and raise errors if they are passed the wrong number of arguments. If the proc requires an argument but no argument is passed then the proc returns nil.  If too many arguments are passed than it ignores the extra arguments.
+
+  <p></p>
+  <li><strong>Lambdas and procs treat the 'return' keyword differently</strong></li>
+  <p></p>
+
+'return' inside of a lambda triggers the code right outside of the lambda code
+
+```ruby
+def lambda_test
+  lam = lambda { return }
+  lam.call
+  puts "Hello world"
+end
+
+lambda_test                 # calling lambda_test prints 'Hello World'
+```
+
+'return' inside of a proc triggers the code outside of the method where the proc is being executed
+
+```ruby
+def proc_test
+  proc = Proc.new { return }
+  proc.call
+  puts "Hello world"
+end
+
+proc_test                 # calling proc_test prints nothing
+```
+</ol>
+
+
+<h3>So what is a closure?</h3>
+
+<p><strong>Coder Talk</strong>: &lsquo;A function or a reference to a function together with a referencing environment.  Unlike a plain function, closures allow a function to access non-local variables even when invoked outside of its immediate lexical scope.&rsquo; &ndash; Wikipedia</p>
+
+<p><strong>Plain old english</strong>: Similar to a suitcase, it&rsquo;s a group of code that when opened (i.e. called), contains whatever was in it when you packed it (i.e. created it).</p>
+
+<p>```ruby</p>
+
+<h1>Example of Proc objects preserving local context</h1>
+
+<p>def counter
+  n = 0
+  return Proc.new { n+= 1 }
+end</p>
+
+<p>a = counter                <br/>
+a.call            # returns 1
+a.call            # returns 2</p>
+
+<p>b = counter<br/>
+b.call            # returns 1</p>
+
+<p>a.call            # returns 3
+```</p>
+
+<h3>Background Part 1: Lambda Calculus and Anonymous Functions</h3>
+
+<p>Lambda get its name from a type of calculus introduced in the 1930s to help investigate the foundations of mathematics.  Lambda calculus helps make computable functions easier to study by simplifying its semantics.  The most relevant of these simplifications is that is treats functions &lsquo;anonymously&rsquo;, meaning that no explicit names are given to functions.</p>
+
+<p><code>ruby
+sqsum(x,y) = x*x + y*y  #&lt;-- normal function
+(x,y) -&gt; x*x + y*y #&lt;-- anonymous function
+</code></p>
+
+<p>Generally speaking, in programming the term lambda refers to anonymous functions.  These anonymous functions are very common and explicit in some languages (i.e. Javascript) and implicit in others (i.e. Ruby).</p>
+
+<h3>Background Part 2: Where Does the Name Proc Come From</h3>
+
+<p>Proc is short for procedure, which is a set of instructions packaged as a unit to perform a specific task.  In different languages these may be called functions, routines, methods, or the generic term callable units.  They are usually made to be called multiple times and from multiple times in a program.</p>
+
+<h3>Summary Differences</h3>
+
+<ol style="margin-left: 23px;">
+  <li><strong>Procs are objects, blocks are not</strong></li>
+  <li><strong>At most one block can appear in an argument list</strong></li>
+  <li><strong>Lambdas check the number of arguments, while procs do not</strong></li>
+  <li><strong>Lambdas and procs treat the 'return' keyword differently</strong></li>
+</ol>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Building a Mobile App Landing Page]]></title>
+    <link href="http://awaxman11.github.io/blog/2013/07/02/building-a-mobile-app-landing-page/"/>
+    <updated>2013-07-02T12:50:00-04:00</updated>
+    <id>http://awaxman11.github.io/blog/2013/07/02/building-a-mobile-app-landing-page</id>
+    <content type="html"><![CDATA[<p>Over the last year I&rsquo;ve been working on a mobile app called Flock. To get ready for our launch, I created a new <a href="http://flockwithme.com">landing page</a> to allow people to easily download the app.  On a desktop browser, it allows people to input their phone number and receive a text on their phone with a link to download the app.  On a mobile device, it allows people to download the app directly.</p>
+
+<p><img src="/images/Launch-site-blog-image.png"></p>
+
+<h4>The Ingredients</h4>
+
+<ul style="margin-left: 30px;">
+  <li><a href="http://twilio.com">Twilio</a>: An API to make and receive phone calls and send and receive text messages. I used this service to send a text message to desktop users containing a link to download the app.</li>
+  <li><a href="http://fancyapps.com/fancybox/">fancyBox</a>: Tool for displaying images, html content and multi-media in a Mac-style "lightbox" that floats overtop of web page</li>
+  <li><a href="http://tympanus.net/Development/CreativeButtons/">Creative Buttons</a>: Button inspirations from Codrops</li>
+  <li>SASS/Bourbon/Neat:
+    <ul>
+      <li><a href="http://sass-lang.com/">SASS</a>: A CSS extension that adds nested rules, variables, mixins, and selector inheritance</li>
+      <li><a href="http://bourbon.io/">Bourbon</a>: A mixin library for SASS</li>
+      <li><a href="http://neat.bourbon.io/">Neat</a>: A grid framework for SASS with Bourbon</li>
+    </ul>
+  </li>
+</ul>
+
+
+<h4>Sending a Text</h4>
+
+<p>My first step was to get the text message part of the landing page working.  High level I wanted to be able to send users a text message with a link to download Flock on their iPhone.  To do this, I created a form to collect a user&rsquo;s phone number, and then utilized a Twilio gem to send a message to the collected number.</p>
+
+<p>Using the &lsquo;twilio-ruby&rsquo; gem I was able to get a text message up and running relatively quickly by creating a form and adding the Twilio logic in the route associated with that form.</p>
+
+<p>``` ruby
+  def send_text</p>
+
+<pre><code>number = params[:number] # grab user's number from form and assign to 'number' variable
+account_sid = '**********************************' # received after creating an account with Twilio
+auth_token = '********************************' # same as above
+@client = Twilio::REST::Client.new account_sid, auth_token # create a Twilio client (used to send messages)
+@client.account.sms.messages.create( # method on client to create an sms message
+  :from =&gt; '+15555555555', # my Twilio number in actual code
+  :to =&gt; number, # user's number
+  :body =&gt; 'Download Flock and do more together: flockwithme.com/app' # text message content
+) 
+redirect_to root_path
+</code></pre>
+
+<p>  end
+```</p>
+
+<h4>Making it Look Pretty Part 1: Adding a fancyBox</h4>
+
+<p>I wanted to use javascript on the &ldquo;SEND ME A LINK&rdquo; button so that the website didn&rsquo;t have to load a new page to display the number form.  Not wanting to re-invent the wheel, I looked around for js plugins and ended up choosing fancyBox, a library to easily implement &ldquo;lightbox&rdquo; popups.</p>
+
+<p>To implement this plugin, there were a couple main steps:</p>
+
+<ol style="margin-left: 30px;">
+  <li>Create a hidden div containing the number form</li>
+  <li>Link a button to the hidden div</li>
+  <li>Add the necessary js from fancyBox</li>
+</ol>
+
+
+<p></p>
+
+<p>```html</p>
+
+<h1>STEP 1: Add hidden div containing form</h1>
+
+<h1>Note: id = &ldquo;number_form&rdquo;</h1>
+
+<div style="display:none" class="text" id="number_form">
+    <%= form_tag(send_text_path, :method => :post) do %>
+      <%= text_field_tag(:number, nil, :placeholder => '555-555-5555')%><br>
+      <%= submit_tag("Submit") %>
+    <% end %>
+</div>
+
+
+<h1>STEP 2: Creata a button that links to the hidden div</h1>
+
+<h1>Note: class = &ldquo;fancybox&rdquo; and href = &ldquo;#number_form&rdquo; (id of div from STEP 1)</h1>
+
+<p><a href="#number_form" class="fancybox"><div>SEND ME A LINK</div></a></p>
+
+<h1>STEP 3: Add the fancyBox js to show the div when the button is clicked</h1>
+
+<h1>Note: I am calling the function &ldquo;fancybox&rdquo; on all links</h1>
+
+<h1>that have a class named &ldquo;fancybox&rdquo; (from STEP 2)</h1>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+      $("a.fancybox").fancybox({
+        maxWidth: 900,
+        helpers : {
+            overlay : {
+                css : {
+                    'background' : 'rgba(0, 0, 0, 0.8)'
+                }
+            },
+        }
+      });
+    });
+
+</script>
+
+
+<p>```</p>
+
+<h4>Making it Look Pretty Part 2: A Fancy Button</h4>
+
+<p><img src="/images/fancy-button.png" title="Fancy Button" ></p>
+
+<p>Once I got the fancyBox working, I wanted to customize the styling of the form. Earlier in the week I stumbled across an awesome <a href="http://tympanus.net/Development/CreativeButtons/">link</a> from Codrops that had examples of many different buttons using CSS.  I chose my favorite and added the appropriate CSS.</p>
+
+<p>The button I chose gives a 3D effect by creating a shadow and making the shadow smaller / shifting down the button while hovering over the button, and removing the shadow all together when clicked.</p>
+
+<p>```scss</p>
+
+<p>// Note I am using SASS, which allows me to nest my css</p>
+
+<p>input[type=submit] {</p>
+
+<pre><code>border: none;
+cursor: pointer;
+width: 100%;
+padding: 15px 0px;
+margin: 15px 0px;
+text-transform: uppercase;
+position: relative;
+background: $green;
+box-shadow: 0 6px #527a52;
+font-family: "proxima-nova", "sans-serif";
+font-style: italic;
+font-weight: 800;
+font-size: 1.2em;
+color: white;
+border-radius: 0 0 5px 5px;
+
+&amp;:hover{
+box-shadow: 0 4px #527a52;
+top: 2px;
+}
+
+&amp;:active{
+  box-shadow: 0 0 #527a52;
+  top: 6px;
+}
+</code></pre>
+
+<p>  }</p>
+
+<p>```</p>
+
+<h4>Making it Look Pretty Part 3: Responsive Design</h4>
+
+<p>Once I got the button looking sharp on a desktop browser, I then wanted to make the page responsive for mobile users.  Not only did I want to change the styling so it looked good on a phone, but I also wanted to change the main button so that when a user opens the site on their iPhone the &ldquo;SEND ME A LINK&rdquo; button turns into a &ldquo;DOWNLOAD THE APP&rdquo; button that takes him or her directly to the App Store.</p>
+
+<p>I made the button (and rest of the website) responsive using Bourbon and Neat. Bourbon is a mixin library for SASS, and Neat is a grid framework for SASS with Bourbon.</p>
+
+<p>```scss</p>
+
+<p>// STEP 1: Define a mobile breakpoint (Neat version of CSS media query)
+$break_four: new-breakpoint(max-width 585px);</p>
+
+<p>// STEP 2: Define style to hide elements where class = &ldquo;mobile&rdquo;</p>
+
+<p>.mobile {
+ display: none;
+}</p>
+
+<p>// STEP 3: Hide items where class = &ldquo;desktop&rdquo; and show
+//         items where class = &ldquo;mobile&rdquo; at breakpoint</p>
+
+<p>@include media($break_four) {
+  .desktop {</p>
+
+<pre><code>display: none;
+</code></pre>
+
+<p>  }
+  .mobile {</p>
+
+<pre><code>display: block;
+</code></pre>
+
+<p>  }
+}</p>
+
+<p>// STEP 4: Add classes where appropriate</p>
+
+<div id="button">  
+    <a href="#number_form" class="desktop fancybox"><div>SEND ME A LINK</div></a>
+    <a href="http://bit.ly/11LgLAn" class="mobile"><div>DOWNLOAD THE APP</div></a>
+</div>
+
+
+<p>```</p>
+
+<p>And that&rsquo;s how to create a simple landing page for a mobile app!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Using the Twitter API to Find People]]></title>
+    <link href="http://awaxman11.github.io/blog/2013/06/17/twitter-api/"/>
+    <updated>2013-06-17T00:12:00-04:00</updated>
+    <id>http://awaxman11.github.io/blog/2013/06/17/twitter-api</id>
+    <content type="html"><![CDATA[<h4>Inspiration</h4>
+
+<p>Over the last year I&rsquo;ve become a huge Twitter fan.  So much so that I had to move it off the front page of my phone so I wouldn&rsquo;t be (as) distracted throughout the day.  In addition to my personal account, I have several accounts for projects I&rsquo;m working on.  I use these accounts to discover and interact with people that may be interested in these apps.</p>
+
+<p>To discover people that I think may be interested, I look at recent followers of similar apps.  While this process worked alright, it was a very manual.  Also, one of the apps I&rsquo;m working on is only available in NYC, and there was no way to search for people only living in NYC and the surrounding area.</p>
+
+<h4>Using the Twitter API</h4>
+
+<p>I decided that I could use the Twitter API to help automate this process.  For example, let&rsquo;s pretend that I am creating starting a Ruby Motion meetup in NYC.  I&rsquo;d like to find people in the NYC area that are interested in Ruby Motion.  Using Twitter, I can find these people a couple of different ways:</p>
+
+<ol style="margin-left: 30px;">
+  <li>Look for people that follow @RubyMotion</li>
+  <li>Look for people that recently tweeted "#rubymotion"</li>
+</ol>
+
+
+<p>In addition to finding people that match either of the criteria above, I also want to make sure they live in the NYC area.</p>
+
+<h4>Getting Started</h4>
+
+<p>I first looked into the best way to access the Twitter API from a ruby environment.  As Twitter is a very popular app, I figured there was likely a good gem.  After searching for &lsquo;Twitter&rsquo; on <a href="https://ruby-toolbox.com">www.ruby-toolbox.com</a>, I ended up deciding to go with the &lsquo;Twitter&rsquo; gem.  After installing this gem in the terminal, I required the rubygems gem and twitter gem in my ruby file.</p>
+
+<p><code>ruby
+require 'rubygems'
+require 'twitter'
+</code></p>
+
+<p>Next I read the gem documentation on <a href="https://github.com/sferik/twitter">github</a>, and followed the steps to register and authorize my app.  After registering my app on the <a href="https://dev.twitter.com/apps/new">Twitter Developer site</a>, it was just a few lines of code before I was up and running.</p>
+
+<p><code>ruby
+Twitter.configure do |config|
+  config.consumer_key = "**********************"
+  config.consumer_secret = "*****************************************"
+  config.oauth_token = "**************************************************"
+  config.oauth_token_secret = "*****************************************"
+end
+</code></p>
+
+<p>Now I was up and running!  To tweet about the new meetup was just a simple line away:</p>
+
+<p><code>ruby
+Twitter.update("Come on out to our Ruby Motion meetup next Tuesday @ 6:30pm!")
+</code></p>
+
+<p>Now for finding relevant people:</p>
+
+<p>``` ruby
+nyc_accounts = {}
+index = 0
+cursor = -1</p>
+
+<h1>Loop through pages 1-10</h1>
+
+<p>while index &lt;15 do</p>
+
+<pre><code># Iterate through followes
+followers = Twitter.followers("RubyMotion", :cursor =&gt; -1)
+
+# Save the users 
+followers.users.each do |user|
+  rubymotion_accounts[user.screen_name] = user.location if user.location.downcase =~ /(nyc|york)/i
+end
+
+cursor = followers.next_cursor
+index+=1
+</code></pre>
+
+<p>end
+```</p>
+
+<p>The code above makes a call to the Twitter API to grab the followers for a sprcific Twitter account, in this case RubyMotion.  The way the Twitter API works, each call returns an object that contains an array of 20 seperate hashes, which contain information about each of the followers. Because the API rate limits of the Twitter API are relatively small, I decided to loop through only 15 pages of followers.</p>
+
+<p>Next, I went through each Twitter object and added the username and location of the follower if the location contained either nyc or york (using regular expressions). The result is a hash where the keys are usernames and the values are locations for, containing information of people that follow RubyMotion and have a location that contains either &lsquo;NYC&rsquo; or &lsquo;York&rsquo;.</p>
+
+<p>On to the next one:</p>
+
+<p>``` ruby
+rubymotion_accounts_2 = {}</p>
+
+<p>Twitter.search(&ldquo;#rubymotion&rdquo;, :count => 100, :result_type => &ldquo;recent&rdquo;).results.each do |status|
+  rubymotion_accounts_2[status.attrs[:user][:screen_name]]=status.attrs[:user][:location] if status.attrs[:user][:location].downcase =~ /(nyc|york)/i
+end</p>
+
+<p>```</p>
+
+<p>For the second call, I a utilizing the search method, and querying the most recent 100 tweets that contain the #rubymotion tag.  This call returns a Twitter object that contains an array of all the tweets.  Each item of the array contains a hash with information about the user.  I then saved the username and location of the tweeter if the location of that person contained &lsquo;NYC&rsquo; or &lsquo;York&rsquo; again.</p>
+
+<p>Saving the data into a database:</p>
+
+<p>``` ruby
+require &ldquo;sqlite3&rdquo;
+require &lsquo;open-uri&rsquo;</p>
+
+<p>db = SQLite3::Database.new &ldquo;twitter-bot.db&rdquo;</p>
+
+<p>db.execute &lt;&lt;-SQL</p>
+
+<p>  create table twitter_handles (</p>
+
+<pre><code>id INTEGER PRIMARY KEY AUTOINCREMENT,
+twitter_handle TEXT,
+city TEXT
+</code></pre>
+
+<p>  );
+SQL</p>
+
+<p>rubymotion_accounts.each do |handle, city|
+  db.execute(&ldquo;INSERT INTO twitter_handles (twitter_handle, city)</p>
+
+<pre><code>          VALUES (?, ?)", [handle, city])
+</code></pre>
+
+<p>end</p>
+
+<p>rubymotion_accounts_2.each do |handle, city|
+  db.execute(&ldquo;INSERT INTO twitter_handles (twitter_handle, city)</p>
+
+<pre><code>          VALUES (?, ?)", [handle, city])
+</code></pre>
+
+<p>end
+```
+Lastly, I wrote a schema.rb file to create a table and iterate through the 2 hashes I created above and insert the information into the new data.</p>
+
+<h3>Areas of Future Exploration</h3>
+
+<p>One problem I kept on running into was exceeding my API rate limit.  For example, in the first API call, the reason I only scroll through 15 pages is because the Twitter API only allows me to make 15 calls within a 15 minute window.  While finding 300 relevant people seems like a lot, when you add the location constraint it ends up not being that many people. Similarly in the 2nd API call, I only grab the last 100 tweets because that is all the API lets me grab at a time. This made it really hard to find many people that were relevant for this specific search.  When I ran this search I actually ended up with no results because, presumably because of the 100 tweets grabbed, no users were located in New York.</p>
+]]></content>
+  </entry>
+  
+</feed>

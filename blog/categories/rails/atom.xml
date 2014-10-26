@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: rails | Build, Break, Learn.]]></title>
+  <link href="http://awaxman11.github.io/blog/categories/rails/atom.xml" rel="self"/>
+  <link href="http://awaxman11.github.io/"/>
+  <updated>2014-10-26T10:53:52-04:00</updated>
+  <id>http://awaxman11.github.io/</id>
+  <author>
+    <name><![CDATA[Adam Waxman]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Sorting a Rails Resource Based on a Calculated Value]]></title>
+    <link href="http://awaxman11.github.io/blog/2013/10/11/sorting-a-rails-resource-based-on-a-calculated-value/"/>
+    <updated>2013-10-11T09:32:00-04:00</updated>
+    <id>http://awaxman11.github.io/blog/2013/10/11/sorting-a-rails-resource-based-on-a-calculated-value</id>
+    <content type="html"><![CDATA[<h3>The Setup</h3>
+
+<p>I recently went to a mobile payments hackathon and worked on a <a href="http://lit-sands-3416.herokuapp.com/">reminder app</a> with my co-founder of <a href="http://flockwithme.com">Flock</a>. You input the name of your item and the day of the month that it&rsquo;s due. The app then shows you how long you have to complete the given task based on a green to red spectrum inspired by Clear.</p>
+
+<p><img src="/images/reminder_app.png"></p>
+
+<p>Being a hackathon project, we wanted to keep the app simple. It contained a Reminder model with 2 attributes: 1) name and 2) day of the month you want to complete the task.</p>
+
+<h3>The Problem</h3>
+
+<p>I got to a point where I wanted to sort the items by number of days left until the item was due.</p>
+
+<p>If I had a column in the database called &lsquo;days_until_due&rsquo; I could have used the order method:</p>
+
+<p><code>ruby
+Reminder.order('days_until_due ASC')
+</code></p>
+
+<p>But I didn&rsquo;t have a database column called &lsquo;days_until_due'…</p>
+
+<p>This got me asking myself, &ldquo;What&rsquo;s the best way to sort a model based on a calculated value instead of a value stored in the database?&rdquo;</p>
+
+<h3>The Solution</h3>
+
+<p>After googling around I stumbled upon a nice solution. It suggested creating an instance method to calculate the value, and then creating a class method that combines a query with the sort_by method.</p>
+
+<h5>Step 1: Create an instance method to calculate the value</h5>
+
+<p>In reminder.rb, I created an instance method to find out how many days until the item is due based on the day of the month the item was suppoed to be completed by and the current date:</p>
+
+<p>```ruby
+def days_until_due
+  today = Time.now
+  simple_today = Time.new(today.year, today.month, today.day)
+  if day >= today.day</p>
+
+<pre><code>month_due = today.month
+</code></pre>
+
+<p>  else</p>
+
+<pre><code>month_due = today.month + 1
+</code></pre>
+
+<p>  end
+  day_due = Time.new(today.year,month_due,day)
+  return ((day_due &ndash; simple_today)/(60<em>60</em>24)).to_i
+end
+```</p>
+
+<h5>Step 2: Create a class method to query and sort the model</h5>
+
+<p>Again in reminder.rb, I then created a class method, which combined a query, sort_by, and the instance method from above.</p>
+
+<p><code>ruby
+def self.sorted_by_days_until_due
+  Reminder.all.sort_by(&amp;:days_until_due)
+end
+</code>
+You may be asking yourself what is going on in that one line method? Let&rsquo;s break it down step by step. First, Reminder.all returns an array of all the reminders (unsorted).</p>
+
+<p><code>ruby
+Reminder.all.class # =&gt; Array
+</code></p>
+
+<p>Next, I call the sort_by method on this array. This method takes a block as an argument and generates a sorted array by mapping the values through the given block. If no block is given, an enumerator is returned instead. Below is an example:</p>
+
+<p>```ruby
+array = [&ldquo;Michael&rdquo;, &ldquo;Adam&rdquo;, &ldquo;Jen&rdquo;]</p>
+
+<p>array.sort_by{|word| word.length} # => [&ldquo;Jen&rdquo;, &ldquo;Adam&rdquo;, &ldquo;Michael&rdquo;]</p>
+
+<p>array.sort_by # => #&lt;Enumerator: [&ldquo;Michael&rdquo;, &ldquo;Adam&rdquo;, &ldquo;Jen&rdquo;]:sort_by>
+```</p>
+
+<p>Now you&rsquo;re probably asking yourself, but how does &lsquo;&amp;:days_until_due&rsquo; translate into a block? It has to do with procs and blocks. If you&rsquo;re unfamiliar with these terms, you should check out a <a href="http://awaxman11.github.io/blog/2013/08/05/what-is-the-difference-between-a-block/">post</a> I wrote discussing these parts of ruby. In one sentence, the &lsquo;&amp;:&rsquo; syntax is converting the instance method into a proc, and then converting the proc into a block, which is what Array#sort_by takes as an argument.</p>
+
+<p>Below I will make the example above look like the method I used in my reminder app.</p>
+
+<p>```ruby
+array = [&ldquo;Michael&rdquo;, &ldquo;Adam&rdquo;, &ldquo;Jen&rdquo;]</p>
+
+<h1>Passing in a block directly</h1>
+
+<p>array.sort_by{|word| word.length} # => [&ldquo;Jen&rdquo;, &ldquo;Adam&rdquo;, &ldquo;Michael&rdquo;]</p>
+
+<h1>Creating a proc and converting the block to a proc using the &lsquo;&amp;&rsquo; syntax</h1>
+
+<p>proc = :length.to_proc # => #&lt;Proc:0x007f98a225f700>
+array.sort_by(&amp;proc) # => [&ldquo;Jen&rdquo;, &ldquo;Adam&rdquo;, &ldquo;Michael&rdquo;]</p>
+
+<h1>Creating a proc and converting the block to a proc in one step</h1>
+
+<p>array.sort_by(&amp;:length) # => [&ldquo;Jen&rdquo;, &ldquo;Adam&rdquo;, &ldquo;Michael&rdquo;]</p>
+
+<p>```
+The above syntax works by combining implicit type casting with the &lsquo;&amp;&rsquo; operator. The &lsquo;&amp;&rsquo; operator is used in an argument list to convert a Proc instance into a block. If you combine the operator with something other than a Proc instance, implicit type casting will try to convert it to a Proc instance using the to_proc method. Since Symbol#to_proc exists, when we pass a symbol after the &lsquo;&amp;&rsquo; operator, it is converted into a proc, which is then converted into a block.</p>
+
+<p>Going back to my original problem, all this talk about procs and blocks and type casting is what allowed me to create the following one line method:</p>
+
+<p><code>ruby
+def self.sorted_by_days_until_due
+  Reminder.all.sort_by(&amp;:days_until_due)
+end
+</code></p>
+
+<p>This method allowed me to succinctly include a sorted array of reminders in my view with the following:</p>
+
+<p><code>ruby
+@reminders = Reminder.sorted_by_days_until_due
+</code></p>
+
+<p>Now back to coding!</p>
+]]></content>
+  </entry>
+  
+</feed>

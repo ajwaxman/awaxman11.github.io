@@ -1,0 +1,431 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>How jQuery and AJAX Actually Work - Build, Break, Learn.</title>
+  <meta name="author" content="Adam Waxman">
+
+  
+  <meta name="description" content="As someone who loves UX and design, it is not surprising that I&rsquo;ve been wanting to learn about JavaScript &ndash; the language of the browser &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://awaxman11.github.io/blog/2013/07/21/checking-out-js/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Build, Break, Learn." type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-43029008-1', 'awaxman11.github.io');
+  ga('send', 'pageview');
+
+</script>
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Build, Break, Learn.</a></h1>
+  
+    <h2>Adam Waxman's technical blog</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:awaxman11.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">How jQuery and AJAX Actually Work</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-21T23:13:00-04:00" pubdate data-updated="true">Jul 21<span>st</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>As someone who loves UX and design, it is not surprising that I&rsquo;ve been wanting to learn about JavaScript &ndash; the language of the browser that allows for cool client side interactions. I&rsquo;ve used many JS libraries, but wanted to dive deeper into AJAX. Before today I didn&rsquo;t even know what it meant, just that it was something I wanted to know more about.</p>
+
+<h3>So What is AJAX?</h3>
+
+<p>AJAX, or Asynchronous Javascript And XML, is a client side technique for communication with a web server.  In other words, it allows you to fetch data &lsquo;in the background&rsquo; without having to reload a whole page.</p>
+
+<p>In a typical web request, you send a URL request to the server and the server responds with the corresponding HTML, CSS, and JavaScript that generates a full new page in your browser.</p>
+
+<p>In contrast, in a typical AJAX request, the HTML, CSS, and JavaScript is already loaded. Instead of making a URL request for another whole page, you use JavaScript to talk to the server and receive smaller pieces of information that can range from HTML to other data formats like JSON and XML. The JavaScript then acts on the response and updates the page accordingly, without having to refresh the entire page.</p>
+
+<h3>What does an AJAX request look like?</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">settings</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> At a high level an AJAX request consists of the URL you a making a request to, and then corresponding settings to handle the response.  Below are a few of the more popular callbacks that make up the settings:</p>
+
+<ul style="margin-left: 30px;">
+  <li><strong>success</strong>: what to do if the URL request is successful</li>
+  <li><strong>error</strong>: what to do if the URL request is unsuccessful</li>
+  <li><strong>timeout</strong>: how long to allow the URL request to run before an error message pops up</li>
+  <li><strong>beforeSend</strong>: runs before the AJAX request, good place to put a spinner</li>
+    <li><strong>complete</strong>: runs after both success and error, good place to stop a spinner</li>
+</ul>
+
+
+<h3>Examples</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/* Example 1 */</span>
+</span><span class='line'><span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">(</span><span class="s1">&#39;index.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.hello-world&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Example 1: makes a request to &lsquo;index.html&rsquo; and then inserts the response into the item in the DOM that has a class called &ldquo;hello-world&rdquo;</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/* Example 2 */</span>
+</span><span class='line'><span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">(</span><span class="s1">&#39;profile.html?userId=1&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.show&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/* Example 3 */</span>
+</span><span class='line'><span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">(</span><span class="s1">&#39;profile.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.show&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">data</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;userId&quot;</span><span class="o">:</span> <span class="mi">1</span><span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/* Example 4 */</span>
+</span><span class='line'><span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">(</span><span class="s1">&#39;profile.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.show&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">data</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;userId&quot;</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;.show&quot;</span><span class="p">).</span><span class="nx">data</span><span class="p">(</span><span class="s2">&quot;userId&quot;</span><span class="p">)}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/* Corresponding HTML to go with Example 4 */</span>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">div</span> <span class="kr">class</span><span class="o">=</span><span class="s2">&quot;show&quot;</span> <span class="nx">data</span><span class="o">-</span><span class="nx">userId</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="o">&gt;&lt;</span><span class="err">/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>These three examples all make a request to the url &lsquo;profile.html?userId=1&rsquo; and show the various ways to send parameters with a request.  In example 2 the data is put manually into the URL.  In example 3 the data is put into a JavaScript object.  Lastly, in example 4 the AJAX request pulls data from HTML, which when combined with ERB tags can make the request very dynamic.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/* Example 5 */</span>
+</span><span class='line'><span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">(</span><span class="s1">&#39;index.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.hello-world&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">timeout</span><span class="o">:</span> <span class="mi">3000</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">beforeSend</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.hello-world&#39;</span><span class="p">).</span><span class="nx">addClass</span><span class="p">(</span><span class="s1">&#39;is-loading&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">complete</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.hello-world&#39;</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="s1">&#39;.is-loading&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Example 5 demonstrates some of the callback settings.  In this AJAX request, if the response is not successfully made it will stop the request after 3 seconds (3000 milliseconds).  It also demonstrates common code for adding a loading animation while the request is being made.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Adam Waxman</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-21T23:13:00-04:00" pubdate data-updated="true">Jul 21<span>st</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/javascript/'>javascript</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://awaxman11.github.io/blog/2013/07/21/checking-out-js/" data-via="ajwaxman" data-counturl="http://awaxman11.github.io/blog/2013/07/21/checking-out-js/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/07/02/building-a-mobile-app-landing-page/" title="Previous Post: Building a Mobile App Landing Page">&laquo; Building a Mobile App Landing Page</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/08/05/what-is-the-difference-between-a-block/" title="Next Post: What is the difference between a block, a proc, and a lambda in ruby?">What is the difference between a block, a proc, and a lambda in ruby? &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <a style="width: 100%;" href="http://referrals.trhou.se/adamwaxman" target="_blank"><img src="http://wac.a8b5.edgecastcdn.net/80A8B5/static-assets/assets/content/referral-badge-green.png"/></a>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/07/13/how-to-create-an-angular-app-using-yeoman-and-deploy-it-to-heroku/">How to Create  an Angular App Using Yeoman and Deploy it to Heroku</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/25/getting-into-css3-animations/">Getting Into CSS3 Animations</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/10/11/sorting-a-rails-resource-based-on-a-calculated-value/">Sorting a Rails Resource Based on a Calculated Value</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/10/01/deploying-a-rails-app-with-capistrano-part-2/">Deploying a Rails App With Capistrano (Part 2)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/09/deploying-a-rails-app-with-capistrano/">Deploying a Rails App With Capistrano (Part 1)</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+<section>
+  <h1>About Me</h1>
+  <div id="twitter-profile" style="margin-top:0.5em;">
+    <p>
+      <strong>Adam Waxman</strong> 
+      (<a href="http://twitter.com/ajwaxman">@ajwaxman</a>)
+    </p>
+    <p>Product at <a href="https://seatgeek.com">SeatGeek</a>. <a href="http://flatironschool.com">Flatiron School</a> grad. I like to build stuff - <a href="https://twitter.com/flockwme">Flock</a> | <a href="https://twitter.com/rulethejungle">Rule the Jungle</a> | <a href="https://twitter.com/found_io">Found</a></p>
+  </div>
+  <script type="text/javascript">
+    $.domReady(function(){
+        var container = $('#twitter-profile'),
+            user = "ajwaxman";
+        
+        function parseTwLinks(s) {
+          var twUrl = "http://www.twitter.com/"
+          s = s.replace(/ (@([\w]+))/g, function(match, p1, p2) {
+              return " <a href='"+twUrl+p2+"'>"+p1+"</a>"
+          }).replace(/ (#([\w]+))/g, function(match, p1, p2) {
+              return " <a href='"+twUrl+"#!/search?q=%23"+p2+"'>"+p1+"</a>"
+          })
+          return s
+        }
+
+        $.ajax({
+            url: "http://api.twitter.com/1/users/show.json?include_entities=false&screen_name="+user+"&callback=?"
+          , type: 'jsonp'
+          , error: function (err) { $('#twitter-profile').addClass('error');  }
+          , success: function(data) {
+              container.html('<img class="left" src="http://api.twitter.com/1/users/profile_image/'+user+'.json?size=bigger" alt="@'+user+'"><p><strong>'+data.name+'</strong> (<a href="http://twitter.com/'+user+'">@'+user+'</a>)<br/>'+data.location+'</p><p>'+parseTwLinks(data.description)+'</p>');
+            }
+        })
+      });
+  </script>
+</section>
+<section>
+  <h1>Connect on Twitter!</h1>
+  <a class="twitter-timeline" href="https://twitter.com/ajwaxman" data-widget-id="370245364177047552">Tweets by @ajwaxman</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Adam Waxman -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+  - <span class="credit">Theme by <a href="http://www.gehaxelt.in">Gehaxelt</a></span>
+  <span class="credit">and <a href="http://www.it-solutions-neef.de">IT Solutions Neef</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'awaxman-coding';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://awaxman11.github.io/blog/2013/07/21/checking-out-js/';
+        var disqus_url = 'http://awaxman11.github.io/blog/2013/07/21/checking-out-js/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
