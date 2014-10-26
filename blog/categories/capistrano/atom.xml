@@ -4,7 +4,7 @@
   <title><![CDATA[Category: capistrano | Build, Break, Learn.]]></title>
   <link href="http://awaxman11.github.io/blog/categories/capistrano/atom.xml" rel="self"/>
   <link href="http://awaxman11.github.io/"/>
-  <updated>2014-10-26T11:32:28-04:00</updated>
+  <updated>2014-10-26T11:33:39-04:00</updated>
   <id>http://awaxman11.github.io/</id>
   <author>
     <name><![CDATA[Adam Waxman]]></name>
@@ -247,7 +247,7 @@ The repository variable tells Capistrano where to find your code.  We used a git
 <p><code>ruby
 set :user, 'USERNAME'
 </code>
-The above line sets the name of the user we are deploying as.  For example if you are SSHing into your server with the following command &lsquo;ssh <a href="&#x6d;&#97;&#x69;&#108;&#x74;&#111;&#58;&#x65;&#x78;&#x61;&#x6d;&#x70;&#108;&#101;&#64;&#49;&#x39;&#x32;&#x2e;&#50;&#x34;&#x31;&#46;&#x35;&#53;&#53;&#x2e;&#53;&#53;">&#x65;&#x78;&#97;&#x6d;&#112;&#108;&#x65;&#64;&#x31;&#57;&#50;&#46;&#x32;&#x34;&#x31;&#x2e;&#53;&#x35;&#x35;&#x2e;&#x35;&#x35;</a>&rsquo; then you&rsquo;d set :user to example.</p>
+The above line sets the name of the user we are deploying as.  For example if you are SSHing into your server with the following command &lsquo;ssh <a href="&#x6d;&#97;&#105;&#108;&#x74;&#x6f;&#58;&#x65;&#x78;&#97;&#x6d;&#112;&#108;&#x65;&#x40;&#x31;&#57;&#50;&#x2e;&#x32;&#x34;&#x31;&#x2e;&#x35;&#53;&#x35;&#x2e;&#53;&#53;">&#x65;&#120;&#97;&#x6d;&#x70;&#108;&#101;&#64;&#49;&#57;&#x32;&#x2e;&#x32;&#x34;&#x31;&#x2e;&#x35;&#53;&#x35;&#x2e;&#x35;&#53;</a>&rsquo; then you&rsquo;d set :user to example.</p>
 
 <p><code>ruby
 set :deploy_to, "/home/#{ user }/#{ application }"
