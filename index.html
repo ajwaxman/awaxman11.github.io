@@ -41,6 +41,8 @@
 
   
 
+
+  
 </head>
 
 <body   >
@@ -50,10 +52,6 @@
     <h2>Adam Waxman's technical blog</h2>
   
 </hgroup>
-
-
-
-
 
 </header>
   <nav role="navigation"><ul class="subscription" data-subscription="rss">
@@ -1053,7 +1051,7 @@ ruby</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>The above line sets the name of the user we are deploying as.  For example if you are SSHing into your server with the following command &lsquo;ssh <a href="&#109;&#97;&#x69;&#108;&#116;&#x6f;&#58;&#x65;&#120;&#x61;&#109;&#x70;&#108;&#x65;&#x40;&#49;&#57;&#x32;&#46;&#x32;&#52;&#49;&#46;&#x35;&#53;&#53;&#x2e;&#x35;&#53;">&#101;&#x78;&#97;&#x6d;&#112;&#108;&#x65;&#x40;&#x31;&#57;&#x32;&#46;&#50;&#52;&#x31;&#46;&#53;&#x35;&#53;&#x2e;&#x35;&#x35;</a>&rsquo; then you&rsquo;d set :user to example.</p>
+<p>The above line sets the name of the user we are deploying as.  For example if you are SSHing into your server with the following command &lsquo;ssh <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#x3a;&#101;&#120;&#97;&#x6d;&#112;&#108;&#x65;&#x40;&#x31;&#57;&#50;&#x2e;&#50;&#52;&#49;&#x2e;&#x35;&#x35;&#x35;&#x2e;&#53;&#x35;">&#101;&#120;&#x61;&#109;&#112;&#x6c;&#101;&#64;&#49;&#57;&#50;&#x2e;&#50;&#x34;&#x31;&#x2e;&#53;&#53;&#x35;&#46;&#x35;&#x35;</a>&rsquo; then you&rsquo;d set :user to example.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">set</span> <span class="ss">:deploy_to</span><span class="p">,</span> <span class="s2">&quot;/home/</span><span class="si">#{</span> <span class="n">user</span> <span class="si">}</span><span class="s2">/</span><span class="si">#{</span> <span class="n">application</span> <span class="si">}</span><span class="s2">&quot;</span>
